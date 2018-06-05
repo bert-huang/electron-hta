@@ -1,0 +1,31 @@
+{
+  "name": "electron-hta",
+  "version": "1.0.0",
+  "description": "HTA powered by Electron",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bert-huang/electron-hta.git"
+  },
+  "keywords": [
+    "electron",
+    "hta",
+    "window"
+  ],
+  "author": "bert-huang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bert-huang/electron-hta/issues"
+  },
+  "homepage": "https://github.com/bert-huang/electron-hta#readme",
+  "dependencies": {
+    "argparse": "^1.0.10",
+    "electron": "^2.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  }
+}
