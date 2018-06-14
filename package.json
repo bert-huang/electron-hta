@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/bert-huang/electron-hta#readme",
   "dependencies": {
-    "argparse": "^1.0.10",
-    "electron": "^2.0.2"
+    "electron": "^2.0.2",
+    "yargs": "^11.0.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1"
