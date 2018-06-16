@@ -1,7 +1,7 @@
-const path = require('path');
+const paths = require('path');
 const cp = require('child_process');
 
-let args = [path.join(__dirname, 'app', 'main.js')]
+let args = [paths.join(__dirname, 'app', 'main.js')];
 args = args.concat(process.argv.slice(2));
 try {
   const electron = require('electron');

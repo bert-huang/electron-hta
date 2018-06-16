@@ -3,113 +3,109 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const findprocess = require('find-process');
-const path = require('path');
+const paths = require('path');
 const { app, BrowserWindow } = require('electron');
 const yargs = require('yargs');
 
 /*
  * Parses the command line arguments
  */
-const parseArguments = () => {
-  return yargs.options({
-    'path': {
+const parseArguments = () => (yargs
+  .options({
+    path: {
       alias: 'p',
       describe: 'Path (URL) to launch',
       type: 'string',
       demandOption: true,
     },
-    'width': {
+    width: {
       alias: 'x',
       describe: 'Width of the window',
       default: 1024,
-      type: 'number'
+      type: 'number',
     },
-    'height': {
+    height: {
       alias: 'y',
       describe: 'Height of the window',
       default: 768,
-      type: 'number'
+      type: 'number',
     },
-    'singleton': {
+    singleton: {
       alias: 's',
       describe: 'Only allow a single instance',
       default: false,
       type: 'boolean',
-      implies: 'singleton-id'
+      implies: 'singletonId',
     },
-    'singleton-id': {
+    singletonId: {
       alias: 'i',
       describe: 'Identifier for the singleton option',
       default: null,
-      type: 'string'
+      type: 'string',
     },
-    'full-screen': {
+    fullscreen: {
       alias: 'f',
       describe: 'Launch the window in full screen mode',
       default: false,
-      type: 'boolean'
+      type: 'boolean',
     },
-    'always-on-top': {
+    alwaysOnTop: {
       alias: 't',
       describe: 'Force the window to be always on top of other windows',
       default: false,
-      type: 'boolean'
+      type: 'boolean',
     },
-    'show-menu': {
+    showMenu: {
       alias: 'm',
       describe: 'Show menu bar in the window',
       default: false,
-      type: 'boolean'
+      type: 'boolean',
     },
   })
   .alias('help', 'h')
   .alias('version', 'v')
-  .argv;
-}
+  .argv);
 
 /*
  * Return the accepted URL
  */
-const getUrl = (path) => {
-  if (path.startsWith('http://') ||
-      path.startsWith('https://') ||
-      path.startsWith('file://')) {
-    return path;
+const getUrl = (url) => {
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
+    return url;
   }
-  else {
-    try {
-      if (fs.statSync(path).isFile()) {
-        return 'file://' + path;
-      }
-    } catch (e) {
-      return null;
+  try {
+    if (fs.statSync(url).isFile()) {
+      return `file://${url}`;
     }
   }
+  catch (e) {
+    return null;
+  }
   return null;
-}
+};
 
 /*
  * Find the process with the given process ID
  */
 const findProcess = async (pid) => {
-  let list = await findprocess('pid', pid);
+  const list = await findprocess('pid', pid);
   return list.length ? list[0] : null;
-}
+};
 
 /**
  * Forcefully create the directory.
  * If a non-directory exists, remove it
  * and create a new directory on top of it.
  */
-const forceCreateDirectory = (path) => {
-  if (!fs.existsSync(path)) {
-    mkdirp.sync(path);
+const forceCreateDirectory = (dir) => {
+  if (!fs.existsSync(dir)) {
+    mkdirp.sync(dir);
   }
-  else if (!fs.statSync(path).isDirectory()) {
-    rimraf.sync(path);
-    mkdirp.sync(path);
+  else if (!fs.statSync(dir).isDirectory()) {
+    rimraf.sync(dir);
+    mkdirp.sync(dir);
   }
-}
+};
 
 /**
  * Main routine
@@ -119,18 +115,19 @@ const forceCreateDirectory = (path) => {
 
   /* Extract CLI arguments */
   const argv = parseArguments();
-  const width = argv['width'];
-  const height = argv['height'];
-  const alwaysOnTop = argv['always-on-top'];
-  const fullScreen = argv['full-screen'];
-  const showMenu = argv['show-menu'];
-  const singleton = argv['singleton'];
-  const singletonId = argv['singleton-id'];
-
-  
-  const url = getUrl(argv.path);
+  const {
+    path,
+    width,
+    height,
+    alwaysOnTop,
+    fullScreen,
+    showMenu,
+    singleton,
+    singletonId,
+  } = argv;
+  const url = getUrl(path);
   if (!url) {
-    process.stderr.write(`Invalid URL: ${argv.path}`);
+    process.stderr.write(`Invalid URL: ${path}`);
     process.exit(1);
   }
 
@@ -142,8 +139,8 @@ const forceCreateDirectory = (path) => {
       show: false,
       webPreferences: {
         nodeIntegration: false,
-        sandbox: true
-      }
+        sandbox: true,
+      },
     });
     win.loadURL(url);
     win.once('closed', onClose);
@@ -151,20 +148,20 @@ const forceCreateDirectory = (path) => {
       if (!showMenu) {
         win.setMenu(null);
       }
-      win.setFullScreen(fullScreen)
+      win.setFullScreen(fullScreen);
       win.show();
     });
-  }
+  };
 
   /* If singleton mode is on, try obtaining
    * the lock (a simple lock by file checking). */
   if (singleton) {
     /* Always create locks in the OS temp directory. */
-    const tmpDir = path.join(os.tmpdir(), 'hta-locks');
+    const tmpDir = paths.join(os.tmpdir(), 'hta-locks');
     forceCreateDirectory(tmpDir);
 
     /* Attempt to obtain lock */
-    const htaLock = path.join(tmpDir, singletonId);
+    const htaLock = paths.join(tmpDir, singletonId);
     if (fs.existsSync(htaLock)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(htaLock).isFile()) {
@@ -196,7 +193,7 @@ const forceCreateDirectory = (path) => {
     }
     /* Create the lock and write the current PID to the lock file. */
     fs.writeFileSync(htaLock, process.pid, (err) => {
-      if(err) {
+      if (err) {
         process.stderr.write(`Unable to write lock: ${singletonId}`);
         process.exit(1);
       }
