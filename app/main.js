@@ -120,7 +120,7 @@ const forceCreateDirectory = (dir) => {
     width,
     height,
     alwaysOnTop,
-    fullScreen,
+    fullscreen,
     showMenu,
     singleton,
     singletonId,
@@ -148,7 +148,7 @@ const forceCreateDirectory = (dir) => {
       if (!showMenu) {
         win.setMenu(null);
       }
-      win.setFullScreen(fullScreen);
+      win.setFullScreen(fullscreen);
       win.show();
     });
   };
