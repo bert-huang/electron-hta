@@ -23,6 +23,9 @@
   "homepage": "https://github.com/bert-huang/electron-hta#readme",
   "dependencies": {
     "electron": "^2.0.2",
+    "find-process": "^1.1.1",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.2",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
