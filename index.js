@@ -2,6 +2,7 @@ const os = require('os');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
+const chokidar = require('chokidar');
 const findprocess = require('find-process');
 const paths = require('path');
 const { app, BrowserWindow } = require('electron');
@@ -134,7 +135,7 @@ const /* void */ forceCreateDirectory = (dir) => {
   } = argv;
   const url = getUrl(path);
   if (!url) {
-    process.stderr.write(`Invalid URL: ${path}`);
+    process.stderr.write(`Invalid URL: ${path}\n`);
     process.exit(1);
   }
 
@@ -162,12 +163,6 @@ const /* void */ forceCreateDirectory = (dir) => {
     });
   };
 
-  const focusWindow = () => {
-    if (win) {
-      win.focus();
-    }
-  };
-
   app.on('window-all-closed', () => {
     app.quit();
   });
@@ -175,30 +170,31 @@ const /* void */ forceCreateDirectory = (dir) => {
   /* If singleton mode is on, try obtaining
    * the lock (a simple lock by file checking). */
   if (singleton) {
+    let isLocked = true;
+
     /* Always create locks in the OS temp directory. */
     forceCreateDirectory(LOCKS_DIR);
+    forceCreateDirectory(COMMS_DIR);
 
     /* Attempt to obtain lock */
     const lockFile = paths.join(LOCKS_DIR, singleton);
+    const commFile = paths.join(COMMS_DIR, singleton);
     if (fs.existsSync(lockFile)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(lockFile).isFile()) {
         rimraf.sync(lockFile);
+        isLocked = false;
       }
       /* Read the PID stored in the lock file and attempt
        * to find an electron process with the same PID.
        * If a process is indeed found, that means an existing
        * instance of the singleton is already running. */
       else {
-        const pid = fs.readFileSync(lockFile, (err) => {
-          if (err) {
-            process.stderr.write(`Unable to read lock: ${singleton}`);
-            process.exit(1);
-          }
-        });
+        const pid = fs.readFileSync(lockFile, 'utf8');
         const proc = await findProcess(pid);
         if (proc && proc.name.toLowerCase() === 'electron') {
-          process.stderr.write(`Instance already running: ${singleton}`);
+          process.stderr.write(`Instance already running: ${singleton}\n`);
+          fs.appendFileSync(commFile, 'focus\n');
           process.exit(1);
         }
         /* In the scenario where the lock is not cleaned up correctly,
@@ -206,24 +202,46 @@ const /* void */ forceCreateDirectory = (dir) => {
          * remove the lock. */
         else {
           rimraf.sync(lockFile);
+          isLocked = false;
         }
       }
     }
-    /* Create the lock and write the current PID to the lock file. */
-    fs.writeFileSync(lockFile, process.pid, (err) => {
-      if (err) {
-        process.stderr.write(`Unable to write lock: ${singleton}`);
-        process.exit(1);
-      }
-    });
+    else {
+      isLocked = false;
+    }
 
-    app.on('ready', createWindow.bind(this, () => {
-      win = null;
-      /* Clean up lock file on exit. */
-      rimraf.sync(lockFile);
-    }));
+    if (!isLocked) {
+      /* Create the lock and write the current PID to the lock file. */
+      fs.writeFileSync(lockFile, process.pid, (err) => {
+        if (err) {
+          process.stderr.write(`Unable to write lock: ${singleton}\n`);
+          process.exit(1);
+        }
+      });
+
+      const onCommFileChange = path => {
+        const content = fs.readFileSync(path, 'utf8');
+        const actions = content ? content.split('\n') : null
+        if (actions) {
+          for (let i = 0; i < actions.length; i++) {
+            if (actions[i] === 'focus') { app.focus(); }
+          }
+        }
+        rimraf.sync(path);
+      };
+      
+      const watcher = chokidar.watch(commFile);
+      watcher.on('add', onCommFileChange);
+      watcher.on('change', onCommFileChange);
+
+      app.on('ready', createWindow.bind(this, () => {
+        win = null;
+        /* Clean up lock file on exit. */
+        rimraf.sync(lockFile);
+        rimraf.sync(commFile);
+      }));
+    }
   }
-
   /* No special logic for non-singleton launch. */
   else {
     app.on('ready', createWindow.bind(this, () => {
