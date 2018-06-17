@@ -32,14 +32,7 @@ const parseArguments = () => (yargs
     },
     singleton: {
       alias: 's',
-      describe: 'Only allow a single instance',
-      default: false,
-      type: 'boolean',
-      implies: 'singletonId',
-    },
-    singletonId: {
-      alias: 'i',
-      describe: 'Identifier for the singleton option',
+      describe: 'Limit to a single instance.',
       default: null,
       type: 'string',
     },
@@ -58,6 +51,12 @@ const parseArguments = () => (yargs
     showMenu: {
       alias: 'm',
       describe: 'Show menu bar in the window',
+      default: false,
+      type: 'boolean',
+    },
+    developer: {
+      alias: 'd',
+      describe: 'Enable developer console',
       default: false,
       type: 'boolean',
     },
@@ -123,7 +122,7 @@ const forceCreateDirectory = (dir) => {
     fullscreen,
     showMenu,
     singleton,
-    singletonId,
+    developer,
   } = argv;
   const url = getUrl(path);
   if (!url) {
@@ -138,8 +137,10 @@ const forceCreateDirectory = (dir) => {
       alwaysOnTop,
       show: false,
       webPreferences: {
+        partition: `${process.pid}`,
         nodeIntegration: false,
         sandbox: true,
+        devTools: developer,
       },
     });
     win.loadURL(url);
@@ -165,7 +166,7 @@ const forceCreateDirectory = (dir) => {
     forceCreateDirectory(tmpDir);
 
     /* Attempt to obtain lock */
-    const htaLock = paths.join(tmpDir, singletonId);
+    const htaLock = paths.join(tmpDir, singleton);
     if (fs.existsSync(htaLock)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(htaLock).isFile()) {
@@ -178,13 +179,13 @@ const forceCreateDirectory = (dir) => {
       else {
         const pid = fs.readFileSync(htaLock, (err) => {
           if (err) {
-            process.stderr.write(`Unable to read lock: ${singletonId}`);
+            process.stderr.write(`Unable to read lock: ${singleton}`);
             process.exit(1);
           }
         });
         const proc = await findProcess(pid);
         if (proc.name === 'electron') {
-          process.stderr.write(`Instance already running: ${singletonId}`);
+          process.stderr.write(`Instance already running: ${singleton}`);
           process.exit(1);
         }
         /* In the scenario where the lock is not cleaned up correctly,
@@ -198,7 +199,7 @@ const forceCreateDirectory = (dir) => {
     /* Create the lock and write the current PID to the lock file. */
     fs.writeFileSync(htaLock, process.pid, (err) => {
       if (err) {
-        process.stderr.write(`Unable to write lock: ${singletonId}`);
+        process.stderr.write(`Unable to write lock: ${singleton}`);
         process.exit(1);
       }
     });
