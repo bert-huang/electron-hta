@@ -9,6 +9,7 @@ const yargs = require('yargs');
 
 const WORK_DIR = paths.join(os.tmpdir(), 'electron-hta');
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
+const COMMS_DIR = paths.join(WORK_DIR, 'comms');
 
 /*
  * Parses the command line arguments
@@ -161,6 +162,12 @@ const /* void */ forceCreateDirectory = (dir) => {
     });
   };
 
+  const focusWindow = () => {
+    if (win) {
+      win.focus();
+    }
+  };
+
   app.on('window-all-closed', () => {
     app.quit();
   });
@@ -172,18 +179,18 @@ const /* void */ forceCreateDirectory = (dir) => {
     forceCreateDirectory(LOCKS_DIR);
 
     /* Attempt to obtain lock */
-    const htaLock = paths.join(LOCKS_DIR, singleton);
-    if (fs.existsSync(htaLock)) {
+    const lockFile = paths.join(LOCKS_DIR, singleton);
+    if (fs.existsSync(lockFile)) {
       /* Remove lock if it is not a file */
-      if (!fs.statSync(htaLock).isFile()) {
-        rimraf.sync(htaLock);
+      if (!fs.statSync(lockFile).isFile()) {
+        rimraf.sync(lockFile);
       }
       /* Read the PID stored in the lock file and attempt
        * to find an electron process with the same PID.
        * If a process is indeed found, that means an existing
        * instance of the singleton is already running. */
       else {
-        const pid = fs.readFileSync(htaLock, (err) => {
+        const pid = fs.readFileSync(lockFile, (err) => {
           if (err) {
             process.stderr.write(`Unable to read lock: ${singleton}`);
             process.exit(1);
@@ -198,12 +205,12 @@ const /* void */ forceCreateDirectory = (dir) => {
          * and we cannot find an electron process with the given PID,
          * remove the lock. */
         else {
-          rimraf.sync(htaLock);
+          rimraf.sync(lockFile);
         }
       }
     }
     /* Create the lock and write the current PID to the lock file. */
-    fs.writeFileSync(htaLock, process.pid, (err) => {
+    fs.writeFileSync(lockFile, process.pid, (err) => {
       if (err) {
         process.stderr.write(`Unable to write lock: ${singleton}`);
         process.exit(1);
@@ -213,7 +220,7 @@ const /* void */ forceCreateDirectory = (dir) => {
     app.on('ready', createWindow.bind(this, () => {
       win = null;
       /* Clean up lock file on exit. */
-      rimraf.sync(htaLock);
+      rimraf.sync(lockFile);
     }));
   }
 
