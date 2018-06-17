@@ -7,10 +7,13 @@ const paths = require('path');
 const { app, BrowserWindow } = require('electron');
 const yargs = require('yargs');
 
+const WORK_DIR = paths.join(os.tmpdir(), 'electron-hta');
+const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
+
 /*
  * Parses the command line arguments
  */
-const parseArguments = () => (yargs
+const /* object */ parseArguments = () => (yargs
   .options({
     path: {
       alias: 'p',
@@ -68,7 +71,7 @@ const parseArguments = () => (yargs
 /*
  * Return the accepted URL
  */
-const getUrl = (url) => {
+const /* string */ getUrl = (url) => {
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
     return url;
   }
@@ -86,9 +89,13 @@ const getUrl = (url) => {
 /*
  * Find the process with the given process ID
  */
-const findProcess = async (pid) => {
+const /* object */ findProcess = async (pid) => {
   const list = await findprocess('pid', pid);
-  return list.length ? list[0] : null;
+  return list.length ? {
+    pid: list[0].pid,
+    ppid: list[0].ppid,
+    name: list[0].name,
+  } : null;
 };
 
 /**
@@ -96,7 +103,7 @@ const findProcess = async (pid) => {
  * If a non-directory exists, remove it
  * and create a new directory on top of it.
  */
-const forceCreateDirectory = (dir) => {
+const /* void */ forceCreateDirectory = (dir) => {
   if (!fs.existsSync(dir)) {
     mkdirp.sync(dir);
   }
@@ -156,17 +163,16 @@ const forceCreateDirectory = (dir) => {
 
   app.on('window-all-closed', () => {
     app.quit();
-  })
+  });
 
   /* If singleton mode is on, try obtaining
    * the lock (a simple lock by file checking). */
   if (singleton) {
     /* Always create locks in the OS temp directory. */
-    const tmpDir = paths.join(os.tmpdir(), 'hta-locks');
-    forceCreateDirectory(tmpDir);
+    forceCreateDirectory(LOCKS_DIR);
 
     /* Attempt to obtain lock */
-    const htaLock = paths.join(tmpDir, singleton);
+    const htaLock = paths.join(LOCKS_DIR, singleton);
     if (fs.existsSync(htaLock)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(htaLock).isFile()) {
@@ -184,7 +190,7 @@ const forceCreateDirectory = (dir) => {
           }
         });
         const proc = await findProcess(pid);
-        if (proc.name === 'electron') {
+        if (proc && proc.name.toLowerCase() === 'electron') {
           process.stderr.write(`Instance already running: ${singleton}`);
           process.exit(1);
         }
