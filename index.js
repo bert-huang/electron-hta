@@ -194,6 +194,7 @@ const /* void */ forceCreateDirectory = (dir) => {
         const proc = await findProcess(pid);
         if (proc && proc.name.toLowerCase() === 'electron') {
           process.stderr.write(`Instance already running: ${singleton}\n`);
+          /* Send the focus signal to the already existing singleton instance. */
           fs.appendFileSync(commFile, 'focus\n');
           process.exit(1);
         }
@@ -210,6 +211,7 @@ const /* void */ forceCreateDirectory = (dir) => {
       isLocked = false;
     }
 
+    /* Only proceed if there is no problem with the lock check. */
     if (!isLocked) {
       /* Create the lock and write the current PID to the lock file. */
       fs.writeFileSync(lockFile, process.pid, (err) => {
@@ -219,6 +221,12 @@ const /* void */ forceCreateDirectory = (dir) => {
         }
       });
 
+      /*
+       * Watch changes on the comms file for this singleton instance.
+       * If new comm file is detected or if an existing comm file existed,
+       * read the content and perform relevant actions.
+       * The processed file is then removed until a new file is detected.
+       */
       const onCommFileChange = path => {
         const content = fs.readFileSync(path, 'utf8');
         const actions = content ? content.split('\n') : null
@@ -229,14 +237,13 @@ const /* void */ forceCreateDirectory = (dir) => {
         }
         rimraf.sync(path);
       };
-      
       const watcher = chokidar.watch(commFile);
       watcher.on('add', onCommFileChange);
       watcher.on('change', onCommFileChange);
 
       app.on('ready', createWindow.bind(this, () => {
         win = null;
-        /* Clean up lock file on exit. */
+        /* Clean up lock and comm file on exit. */
         rimraf.sync(lockFile);
         rimraf.sync(commFile);
       }));
