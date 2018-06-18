@@ -215,21 +215,20 @@ if (!ELECTRON_PROCESS_NAME) {
   /* If singleton mode is on, try obtaining
    * the lock (a simple lock by file checking). */
   if (singleton) {
+    /* Always create locks in the OS temp directory. */
+    forceCreateDirectory(LOCKS_DIR);
+    forceCreateDirectory(COMMS_DIR);
+
     /* Use the hash of (singleton identifier + username) to ensure
      * every different user will have their own singleton instance
      * and eliminate any potential invalid characters that may appear
      * from simple concatination. */
     const singletonId = crypto.createHash('md5').update(`${singleton}.${USER}`).digest('hex');
-    let isLocked = true;
-
-    /* Always create locks in the OS temp directory. */
-    forceCreateDirectory(LOCKS_DIR);
-    forceCreateDirectory(COMMS_DIR);
-
     /* Attempt to obtain lock */
     const lockFile = paths.join(LOCKS_DIR, singletonId);
     const commFile = paths.join(COMMS_DIR, singletonId);
 
+    let isLocked = true;
     if (fs.existsSync(lockFile)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(lockFile).isFile()) {
@@ -242,7 +241,7 @@ if (!ELECTRON_PROCESS_NAME) {
        * instance of the singleton is already running. */
       else {
         const pid = fs.readFileSync(lockFile, 'utf8');
-        const proc = await findprocess('pid', pid);
+        const proc = await findProcess(pid);
         if (proc && proc.name === ELECTRON_PROCESS_NAME) {
           process.stderr.write(`Instance '${singleton}' is already running.`);
           /* Send the focus signal to the already existing singleton instance. */
@@ -294,18 +293,28 @@ if (!ELECTRON_PROCESS_NAME) {
       watcher.on('add', onCommFileChange);
       watcher.on('change', onCommFileChange);
 
-      app.on('ready', createWindow.bind(this, () => {
+      const onClose = () => {
         win = null;
         /* Clean up lock and comm file on exit. */
         rimraf.sync(lockFile);
         rimraf.sync(commFile);
-      }));
+      };
+      if (app.isReady()) {
+        createWindow(onClose);
+      } else {
+        app.on('ready', createWindow.bind(this, onClose));
+      }
     }
   }
   /* No special logic for non-singleton launch. */
   else {
-    app.on('ready', createWindow.bind(this, () => {
+    const onClose = () => {
       win = null;
-    }));
+    };
+    if (app.isReady()) {
+      createWindow(onClose);
+    } else {
+      app.on('ready', createWindow.bind(this, onClose));
+    }
   }
 })();
