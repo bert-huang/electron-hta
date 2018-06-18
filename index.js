@@ -39,9 +39,21 @@ const /* object */ parseArguments = () => (yargs
     },
     singleton: {
       alias: 's',
-      describe: 'Limit to a single instance.',
+      describe: 'Limit to a single instance',
       default: null,
       type: 'string',
+    },
+    maximize: {
+      alias: 'm',
+      describe: 'Start the application maximized',
+      default: false,
+      type: 'boolean',
+    },
+    minimize: {
+      alias: 'n',
+      describe: 'Start the application minimized',
+      default: false,
+      type: 'boolean',
     },
     fullscreen: {
       alias: 'f',
@@ -56,7 +68,7 @@ const /* object */ parseArguments = () => (yargs
       type: 'boolean',
     },
     showMenu: {
-      alias: 'm',
+      alias: 'b',
       describe: 'Show menu bar in the window',
       default: false,
       type: 'boolean',
@@ -90,6 +102,20 @@ const /* string */ parseUrl = (url) => {
   return null;
 };
 
+const /* string */ getElectronProcessName = (platform) => {
+  switch(platform) {
+    case 'win32':
+      return'electron.exe';
+    case 'linux':
+    case 'freebsd':
+      return 'electron';
+    case 'darwin':
+      return 'Electron';
+    default:
+      return null;
+  }
+}
+
 /*
  * Find the process with the given process ID
  */
@@ -117,12 +143,18 @@ const /* void */ forceCreateDirectory = (dir) => {
   }
 };
 
+/* Get the platform dependent electron process name */
+const ELECTRON_PROCESS_NAME = getElectronProcessName(os.platform());
+if (!ELECTRON_PROCESS_NAME) {
+  process.stderr.write(`Electron builds are not available on platform: ${os.platform()}`);
+  process.exit(1);
+}
+
 /**
  * Main routine
  */
 (async () => {
   let win = null;
-
   const argv = parseArguments();
   /* Extract CLI arguments */
   const {
@@ -130,6 +162,8 @@ const /* void */ forceCreateDirectory = (dir) => {
     width,
     height,
     alwaysOnTop,
+    maximize,
+    minimize,
     fullscreen,
     showMenu,
     singleton,
@@ -157,12 +191,21 @@ const /* void */ forceCreateDirectory = (dir) => {
     win.loadURL(url);
     win.once('closed', onClose);
     win.once('ready-to-show', () => {
-      if (!showMenu) {
-        win.setMenu(null);
-      }
-      win.setFullScreen(fullscreen);
       win.show();
+      win.setFullScreen(fullscreen);
+      if (!showMenu) { win.setMenu(null); }
+      if (maximize) { win.maximize(); }
+      if (minimize) { win.minimize(); }
     });
+  };
+
+  const focusApp = () => {
+    app.focus();
+    if (win) {
+      /* HACK to bring the window to the foreground. */
+      win.minimize();
+      win.focus();
+    }
   };
 
   app.on('window-all-closed', () => {
@@ -186,6 +229,7 @@ const /* void */ forceCreateDirectory = (dir) => {
     /* Attempt to obtain lock */
     const lockFile = paths.join(LOCKS_DIR, singletonId);
     const commFile = paths.join(COMMS_DIR, singletonId);
+
     if (fs.existsSync(lockFile)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(lockFile).isFile()) {
@@ -198,11 +242,11 @@ const /* void */ forceCreateDirectory = (dir) => {
        * instance of the singleton is already running. */
       else {
         const pid = fs.readFileSync(lockFile, 'utf8');
-        const proc = await findProcess(pid);
-        if (proc && proc.name.toLowerCase() === 'electron') {
-          process.stderr.write(`Instance '${singleton}' is already running.\n`);
+        const proc = await findprocess('pid', pid);
+        if (proc && proc.name === ELECTRON_PROCESS_NAME) {
+          process.stderr.write(`Instance '${singleton}' is already running.`);
           /* Send the focus signal to the already existing singleton instance. */
-          fs.appendFileSync(commFile, 'focus\n');
+          fs.writeFileSync(commFile, 'focus\n');
           process.exit(1);
         }
         /* In the scenario where the lock is not cleaned up correctly,
@@ -223,7 +267,7 @@ const /* void */ forceCreateDirectory = (dir) => {
       /* Create the lock and write the current PID to the lock file. */
       fs.writeFileSync(lockFile, process.pid, (err) => {
         if (err) {
-          process.stderr.write(`Unable to create lock for instance ${singleton}.\n`);
+          process.stderr.write(`Unable to create lock for instance ${singleton}.`);
           process.exit(1);
         }
       });
@@ -239,7 +283,9 @@ const /* void */ forceCreateDirectory = (dir) => {
         const actions = content ? content.split('\n') : null;
         if (actions) {
           for (let i = 0; i < actions.length; i += 1) {
-            if (actions[i] === 'focus') { app.focus(); }
+            if (actions[i] === 'focus') {
+              focusApp();
+            }
           }
         }
         rimraf.sync(path);
