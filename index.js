@@ -1,5 +1,6 @@
 const os = require('os');
 const fs = require('fs');
+const crypto = require('crypto');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const chokidar = require('chokidar');
@@ -11,15 +12,16 @@ const yargs = require('yargs');
 const WORK_DIR = paths.join(os.tmpdir(), 'electron-hta');
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
 const COMMS_DIR = paths.join(WORK_DIR, 'comms');
+const USER = os.userInfo().username;
 
 /*
  * Parses the command line arguments
  */
 const /* object */ parseArguments = () => (yargs
   .options({
-    path: {
-      alias: 'p',
-      describe: 'Path (URL) to launch',
+    url: {
+      alias: 'u',
+      describe: 'URL to launch',
       type: 'string',
       demandOption: true,
     },
@@ -73,7 +75,7 @@ const /* object */ parseArguments = () => (yargs
 /*
  * Return the accepted URL
  */
-const /* string */ getUrl = (url) => {
+const /* string */ parseUrl = (url) => {
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
     return url;
   }
@@ -124,7 +126,7 @@ const /* void */ forceCreateDirectory = (dir) => {
   const argv = parseArguments();
   /* Extract CLI arguments */
   const {
-    path,
+    url,
     width,
     height,
     alwaysOnTop,
@@ -133,9 +135,9 @@ const /* void */ forceCreateDirectory = (dir) => {
     singleton,
     developer,
   } = argv;
-  const url = getUrl(path);
-  if (!url) {
-    process.stderr.write(`Invalid URL: ${path}\n`);
+  const parsedUrl = parseUrl(url);
+  if (!parsedUrl) {
+    process.stderr.write(`Invalid URL: ${url}\n`);
     process.exit(1);
   }
 
@@ -170,6 +172,11 @@ const /* void */ forceCreateDirectory = (dir) => {
   /* If singleton mode is on, try obtaining
    * the lock (a simple lock by file checking). */
   if (singleton) {
+    /* Use the hash of (singleton identifier + username) to ensure
+     * every different user will have their own singleton instance
+     * and eliminate any potential invalid characters that may appear
+     * from simple concatination. */
+    const singletonId = crypto.createHash('md5').update(`${singleton}.${USER}`).digest('hex');
     let isLocked = true;
 
     /* Always create locks in the OS temp directory. */
@@ -177,8 +184,8 @@ const /* void */ forceCreateDirectory = (dir) => {
     forceCreateDirectory(COMMS_DIR);
 
     /* Attempt to obtain lock */
-    const lockFile = paths.join(LOCKS_DIR, singleton);
-    const commFile = paths.join(COMMS_DIR, singleton);
+    const lockFile = paths.join(LOCKS_DIR, singletonId);
+    const commFile = paths.join(COMMS_DIR, singletonId);
     if (fs.existsSync(lockFile)) {
       /* Remove lock if it is not a file */
       if (!fs.statSync(lockFile).isFile()) {
@@ -193,7 +200,7 @@ const /* void */ forceCreateDirectory = (dir) => {
         const pid = fs.readFileSync(lockFile, 'utf8');
         const proc = await findProcess(pid);
         if (proc && proc.name.toLowerCase() === 'electron') {
-          process.stderr.write(`Instance already running: ${singleton}\n`);
+          process.stderr.write(`Instance '${singleton}' is already running.\n`);
           /* Send the focus signal to the already existing singleton instance. */
           fs.appendFileSync(commFile, 'focus\n');
           process.exit(1);
@@ -216,7 +223,7 @@ const /* void */ forceCreateDirectory = (dir) => {
       /* Create the lock and write the current PID to the lock file. */
       fs.writeFileSync(lockFile, process.pid, (err) => {
         if (err) {
-          process.stderr.write(`Unable to write lock: ${singleton}\n`);
+          process.stderr.write(`Unable to create lock for instance ${singleton}.\n`);
           process.exit(1);
         }
       });
@@ -227,11 +234,11 @@ const /* void */ forceCreateDirectory = (dir) => {
        * read the content and perform relevant actions.
        * The processed file is then removed until a new file is detected.
        */
-      const onCommFileChange = path => {
+      const onCommFileChange = (path) => {
         const content = fs.readFileSync(path, 'utf8');
-        const actions = content ? content.split('\n') : null
+        const actions = content ? content.split('\n') : null;
         if (actions) {
-          for (let i = 0; i < actions.length; i++) {
+          for (let i = 0; i < actions.length; i += 1) {
             if (actions[i] === 'focus') { app.focus(); }
           }
         }
