@@ -141,10 +141,10 @@ const /* void */ forceCreateDirectory = (dir) => {
 const PROCESS_NAME = paths.basename(process.argv0);
 
 /* Initialise logging */
-const LOG_LEVEL_NONE  = 0
+const LOG_LEVEL_NONE = 0;
 const LOG_LEVEL_ERROR = 1;
-const LOG_LEVEL_WARN  = 2;
-const LOG_LEVEL_INFO  = 3;
+const LOG_LEVEL_WARN = 2;
+const LOG_LEVEL_INFO = 3;
 const LOG_LEVEL_DEBUG = 4;
 const LOG_LEVEL_TRACE = 5;
 
@@ -165,31 +165,31 @@ const logger = {
   },
   trace: (msg) => {
     if (LOG_LEVEL_TRACE <= _logLevel) {
-      fs.appendFile(logFile, `[TRACE] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      fs.appendFile(logFile, `[TRACE] [${process.pid}] ${util.format(msg)}\n`, () => {});
       process.stdout.write(`${util.format(msg)}\n`);
     }
   },
   debug: (msg) => {
     if (LOG_LEVEL_DEBUG <= _logLevel) {
-      fs.appendFile(logFile, `[DEBUG] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      fs.appendFile(logFile, `[DEBUG] [${process.pid}] ${util.format(msg)}\n`, () => {});
       process.stdout.write(`${util.format(msg)}\n`);
     }
   },
   info: (msg) => {
     if (LOG_LEVEL_INFO <= _logLevel) {
-      fs.appendFile(logFile, `[INFO] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      fs.appendFile(logFile, `[INFO] [${process.pid}] ${util.format(msg)}\n`, () => {});
       process.stdout.write(`${util.format(msg)}\n`);
     }
   },
   warn: (msg) => {
     if (LOG_LEVEL_WARN <= _logLevel) {
-      fs.appendFile(logFile, `[WARN] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      fs.appendFile(logFile, `[WARN] [${process.pid}] ${util.format(msg)}\n`, () => {});
       process.stdout.write(`${util.format(msg)}\n`);
     }
   },
   error: (msg) => {
     if (LOG_LEVEL_ERROR <= _logLevel) {
-      fs.appendFile(logFile, `[ERROR] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      fs.appendFile(logFile, `[ERROR] [${process.pid}] ${util.format(msg)}\n`, () => {});
       process.stderr.write(`${util.format(msg)}\n`);
     }
   },
@@ -255,8 +255,10 @@ const logger = {
     app.focus();
     if (win) {
       logger.debug('Focusing window');
-      /* HACK to bring the window to the foreground. */
-      win.minimize();
+      if (os.platform() === 'win32') {
+        /* HACK to bring the window to the foreground. */
+        win.minimize();
+      }
       win.focus();
     }
   };
@@ -310,7 +312,7 @@ const logger = {
         if (proc && proc.name === PROCESS_NAME) {
           logger.error(`Instance '${singleton}' is already running.`);
           /* Send the focus signal to the already existing singleton instance. */
-          fs.writeFile(commFile, 'focus\n', (err) => {});
+          fs.writeFile(commFile, 'focus\n', () => {});
           app.quit();
         }
         /* In the scenario where the lock is not cleaned up correctly,
@@ -366,7 +368,7 @@ const logger = {
         logger.debug(`Closing window.`);
         win = null;
         /* Clean up lock and comm file on exit. */
-         logger.debug(`Cleaning up lock and comm file.`);
+        logger.debug(`Cleaning up lock and comm file.`);
         rimraf.sync(lockFile);
         rimraf.sync(commFile);
       };
@@ -374,7 +376,8 @@ const logger = {
       logger.debug(`Initialising windows...`);
       if (app.isReady()) {
         createWindow(onClose);
-      } else {
+      }
+      else {
         app.on('ready', createWindow.bind(this, onClose));
       }
     }
@@ -388,7 +391,8 @@ const logger = {
     logger.debug(`Initialising windows...`);
     if (app.isReady()) {
       createWindow(onClose);
-    } else {
+    }
+    else {
       app.on('ready', createWindow.bind(this, onClose));
     }
   }
