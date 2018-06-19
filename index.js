@@ -8,6 +8,7 @@ const findprocess = require('find-process');
 const paths = require('path');
 const { app, BrowserWindow } = require('electron');
 const yargs = require('yargs');
+const util = require('util');
 
 const WORK_DIR = paths.join(os.tmpdir(), 'electron-hta');
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
@@ -79,6 +80,13 @@ const /* object */ parseArguments = () => (yargs
       default: false,
       type: 'boolean',
     },
+    logLevel: {
+      alias: 'l',
+      describe: 'Enable/disable logging (+ setting log level)',
+      choices: ['NONE', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'],
+      default: 'NONE',
+      type: 'string',
+    },
   })
   .alias('help', 'h')
   .alias('version', 'v')
@@ -101,20 +109,6 @@ const /* string */ parseUrl = (url) => {
   }
   return null;
 };
-
-const /* string */ getElectronProcessName = (platform) => {
-  switch(platform) {
-    case 'win32':
-      return'electron.exe';
-    case 'linux':
-    case 'freebsd':
-      return 'electron';
-    case 'darwin':
-      return 'Electron';
-    default:
-      return null;
-  }
-}
 
 /*
  * Find the process with the given process ID
@@ -143,12 +137,63 @@ const /* void */ forceCreateDirectory = (dir) => {
   }
 };
 
-/* Get the platform dependent electron process name */
-const ELECTRON_PROCESS_NAME = getElectronProcessName(os.platform());
-if (!ELECTRON_PROCESS_NAME) {
-  process.stderr.write(`Electron builds are not available on platform: ${os.platform()}`);
-  process.exit(1);
-}
+/* Get the current process name */
+const PROCESS_NAME = paths.basename(process.argv0);
+
+/* Initialise logging */
+const LOG_LEVEL_NONE  = 0
+const LOG_LEVEL_ERROR = 1;
+const LOG_LEVEL_WARN  = 2;
+const LOG_LEVEL_INFO  = 3;
+const LOG_LEVEL_DEBUG = 4;
+const LOG_LEVEL_TRACE = 5;
+
+const LOG_LEVEL_MAP = {
+  NONE: LOG_LEVEL_NONE,
+  ERROR: LOG_LEVEL_ERROR,
+  WARN: LOG_LEVEL_WARN,
+  INFO: LOG_LEVEL_INFO,
+  DEBUG: LOG_LEVEL_DEBUG,
+  TRACE: LOG_LEVEL_TRACE,
+};
+
+const logFile = paths.join(WORK_DIR, 'output.log');
+let _logLevel = 0;
+const logger = {
+  setLogLevel: (level) => {
+    _logLevel = level;
+  },
+  trace: (msg) => {
+    if (LOG_LEVEL_TRACE <= _logLevel) {
+      fs.appendFile(logFile, `[TRACE] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      process.stdout.write(`${util.format(msg)}\n`);
+    }
+  },
+  debug: (msg) => {
+    if (LOG_LEVEL_DEBUG <= _logLevel) {
+      fs.appendFile(logFile, `[DEBUG] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      process.stdout.write(`${util.format(msg)}\n`);
+    }
+  },
+  info: (msg) => {
+    if (LOG_LEVEL_INFO <= _logLevel) {
+      fs.appendFile(logFile, `[INFO] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      process.stdout.write(`${util.format(msg)}\n`);
+    }
+  },
+  warn: (msg) => {
+    if (LOG_LEVEL_WARN <= _logLevel) {
+      fs.appendFile(logFile, `[WARN] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      process.stdout.write(`${util.format(msg)}\n`);
+    }
+  },
+  error: (msg) => {
+    if (LOG_LEVEL_ERROR <= _logLevel) {
+      fs.appendFile(logFile, `[ERROR] [${process.pid}] ${util.format(msg)}\n`, (err) => {});
+      process.stderr.write(`${util.format(msg)}\n`);
+    }
+  },
+};
 
 /**
  * Main routine
@@ -168,14 +213,19 @@ if (!ELECTRON_PROCESS_NAME) {
     showMenu,
     singleton,
     developer,
+    logLevel,
   } = argv;
+
+  logger.setLogLevel(LOG_LEVEL_MAP[logLevel]);
+
   const parsedUrl = parseUrl(url);
   if (!parsedUrl) {
-    process.stderr.write(`Invalid URL: ${url}\n`);
+    logger.error(`Invalid URL: ${url}`);
     process.exit(1);
   }
 
   const createWindow = (onClose) => {
+    logger.debug(`Creating window.`);
     win = new BrowserWindow({
       width,
       height,
@@ -191,6 +241,7 @@ if (!ELECTRON_PROCESS_NAME) {
     win.loadURL(url);
     win.once('closed', onClose);
     win.once('ready-to-show', () => {
+      logger.debug(`Window ready to show.`);
       win.show();
       win.setFullScreen(fullscreen);
       if (!showMenu) { win.setMenu(null); }
@@ -200,8 +251,10 @@ if (!ELECTRON_PROCESS_NAME) {
   };
 
   const focusApp = () => {
+    logger.debug('Focusing app');
     app.focus();
     if (win) {
+      logger.debug('Focusing window');
       /* HACK to bring the window to the foreground. */
       win.minimize();
       win.focus();
@@ -212,9 +265,14 @@ if (!ELECTRON_PROCESS_NAME) {
     app.quit();
   });
 
+  app.on('quit', () => {
+    logger.debug(`Closing down.`);
+  });
+
   /* If singleton mode is on, try obtaining
    * the lock (a simple lock by file checking). */
   if (singleton) {
+    logger.debug(`Singleton mode (key: ${singleton})`);
     /* Always create locks in the OS temp directory. */
     forceCreateDirectory(LOCKS_DIR);
     forceCreateDirectory(COMMS_DIR);
@@ -224,14 +282,19 @@ if (!ELECTRON_PROCESS_NAME) {
      * and eliminate any potential invalid characters that may appear
      * from simple concatination. */
     const singletonId = crypto.createHash('md5').update(`${singleton}.${USER}`).digest('hex');
+    logger.debug(`Singleton ID: ${singletonId}`);
     /* Attempt to obtain lock */
     const lockFile = paths.join(LOCKS_DIR, singletonId);
     const commFile = paths.join(COMMS_DIR, singletonId);
+    logger.debug(`Lock file: ${lockFile}`);
+    logger.debug(`Comm file: ${commFile}`);
 
     let isLocked = true;
     if (fs.existsSync(lockFile)) {
+      logger.debug(`Lock exists.`);
       /* Remove lock if it is not a file */
       if (!fs.statSync(lockFile).isFile()) {
+        logger.debug(`Lock is directory. Removing it.`);
         rimraf.sync(lockFile);
         isLocked = false;
       }
@@ -241,17 +304,20 @@ if (!ELECTRON_PROCESS_NAME) {
        * instance of the singleton is already running. */
       else {
         const pid = fs.readFileSync(lockFile, 'utf8');
+        logger.debug(`Lock content: ${pid}`);
         const proc = await findProcess(pid);
-        if (proc && proc.name === ELECTRON_PROCESS_NAME) {
-          process.stderr.write(`Instance '${singleton}' is already running.`);
+        logger.debug(`PID corresponds to: ${proc? proc.name : null}`);
+        if (proc && proc.name === PROCESS_NAME) {
+          logger.error(`Instance '${singleton}' is already running.`);
           /* Send the focus signal to the already existing singleton instance. */
-          fs.writeFileSync(commFile, 'focus\n');
-          process.exit(1);
+          fs.writeFile(commFile, 'focus\n', (err) => {});
+          app.quit();
         }
         /* In the scenario where the lock is not cleaned up correctly,
          * and we cannot find an electron process with the given PID,
          * remove the lock. */
         else {
+          logger.debug(`Bad lock. Removing it.`);
           rimraf.sync(lockFile);
           isLocked = false;
         }
@@ -261,13 +327,15 @@ if (!ELECTRON_PROCESS_NAME) {
       isLocked = false;
     }
 
+    logger.debug(isLocked ? `Lock is NOT free.` : `Lock is free.`);
     /* Only proceed if there is no problem with the lock check. */
     if (!isLocked) {
       /* Create the lock and write the current PID to the lock file. */
+      logger.debug(`Creating lock file (content: ${process.pid})`);
       fs.writeFileSync(lockFile, process.pid, (err) => {
         if (err) {
-          process.stderr.write(`Unable to create lock for instance ${singleton}.`);
-          process.exit(1);
+          logger.error(`Unable to create lock for instance ${singleton}.`);
+          app.quit();
         }
       });
 
@@ -289,16 +357,21 @@ if (!ELECTRON_PROCESS_NAME) {
         }
         rimraf.sync(path);
       };
+      logger.debug(`Watching on comm file.`);
       const watcher = chokidar.watch(commFile);
       watcher.on('add', onCommFileChange);
       watcher.on('change', onCommFileChange);
 
       const onClose = () => {
+        logger.debug(`Closing window.`);
         win = null;
         /* Clean up lock and comm file on exit. */
+         logger.debug(`Cleaning up lock and comm file.`);
         rimraf.sync(lockFile);
         rimraf.sync(commFile);
       };
+
+      logger.debug(`Initialising windows...`);
       if (app.isReady()) {
         createWindow(onClose);
       } else {
@@ -309,8 +382,10 @@ if (!ELECTRON_PROCESS_NAME) {
   /* No special logic for non-singleton launch. */
   else {
     const onClose = () => {
+      logger.debug(`Closing window.`);
       win = null;
     };
+    logger.debug(`Initialising windows...`);
     if (app.isReady()) {
       createWindow(onClose);
     } else {
