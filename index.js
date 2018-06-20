@@ -221,7 +221,7 @@ const logger = {
   const parsedUrl = parseUrl(url);
   if (!parsedUrl) {
     logger.error(`Invalid URL: ${url}`);
-    process.exit(1);
+    app.quit();
   }
 
   const createWindow = (onClose) => {
@@ -312,7 +312,7 @@ const logger = {
         if (proc && proc.name === PROCESS_NAME) {
           logger.error(`Instance '${singleton}' is already running.`);
           /* Send the focus signal to the already existing singleton instance. */
-          fs.writeFile(commFile, 'focus\n', () => {});
+          fs.writeFileSync(commFile, 'focus\n');
           app.quit();
         }
         /* In the scenario where the lock is not cleaned up correctly,
@@ -378,7 +378,7 @@ const logger = {
         createWindow(onClose);
       }
       else {
-        app.on('ready', createWindow.bind(this, onClose));
+        app.once('ready', createWindow.bind(this, onClose));
       }
     }
   }
@@ -393,7 +393,7 @@ const logger = {
       createWindow(onClose);
     }
     else {
-      app.on('ready', createWindow.bind(this, onClose));
+      app.once('ready', createWindow.bind(this, onClose));
     }
   }
 })();
