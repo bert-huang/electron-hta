@@ -110,6 +110,7 @@ const /* boolean */ validateUrl = async (url) => {
   if (parsed.protocol === 'https:') {
     if (!parsed.port) parsed.set('port', '443');
   }
+  logger.debug(`Validating URL: ${parsed.href}`);
   return fetch(parsed.href, {
     method: 'HEAD',
     mode: 'no-cors',
