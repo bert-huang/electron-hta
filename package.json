@@ -1,26 +1,26 @@
 {
-  "name": "electron-hta",
+  "name": "electron-url-launcher",
   "version": "1.0.0",
-  "description": "HTA powered by Electron",
+  "description": "Electron URL Launcher",
   "main": "index.js",
   "scripts": {
     "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bert-huang/electron-hta.git"
+    "url": "git+https://github.com/bert-huang/electron-url-launcher.git"
   },
   "keywords": [
     "electron",
-    "hta",
+    "url",
     "window"
   ],
   "author": "bert-huang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bert-huang/electron-hta/issues"
+    "url": "https://github.com/bert-huang/electron-url-launcher/issues"
   },
-  "homepage": "https://github.com/bert-huang/electron-hta#readme",
+  "homepage": "https://github.com/bert-huang/electron-url-launcher#readme",
   "dependencies": {
     "chokidar": "^2.0.3",
     "find-process": "^1.1.1",

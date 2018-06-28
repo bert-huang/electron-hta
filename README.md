@@ -1,1 +1,1 @@
-# Electron powered HTA wrapper.
+# Electron URL Launcher
