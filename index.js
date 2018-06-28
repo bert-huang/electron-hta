@@ -1,16 +1,22 @@
 const os = require('os');
 const fs = require('fs');
+const paths = require('path');
 const crypto = require('crypto');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const chokidar = require('chokidar');
 const findprocess = require('find-process');
-const paths = require('path');
-const { app, BrowserWindow } = require('electron');
 const yargs = require('yargs');
-const util = require('util');
+const urlParse = require('url-parse');
+const fetch = require('node-fetch');
+const { app, BrowserWindow } = require('electron');
+const logger = require('./lib/simple-logger');
 
-const WORK_DIR = paths.join(os.tmpdir(), 'electron-hta');
+/* Get the current process name */
+const PROCESS_NAME = paths.basename(process.argv0);
+
+/* Setup constants */
+const WORK_DIR = paths.join(os.tmpdir(), PROCESS_NAME);
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
 const COMMS_DIR = paths.join(WORK_DIR, 'comms');
 const USER = os.userInfo().username;
@@ -93,21 +99,24 @@ const /* object */ parseArguments = () => (yargs
   .parse(process.argv.slice(1)));
 
 /*
- * Return the accepted URL
+ * Check whether the URL format is supported and if
+ * it is reachable.
  */
-const /* string */ parseUrl = (url) => {
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
-    return url;
+const /* boolean */ validateUrl = async (url) => {
+  const parsed = urlParse(url);
+  if (parsed.protocol === 'http:') {
+    if (!parsed.port) parsed.set('port', '80');
   }
-  try {
-    if (fs.statSync(url).isFile()) {
-      return `file://${url}`;
-    }
+  if (parsed.protocol === 'https:') {
+    if (!parsed.port) parsed.set('port', '443');
   }
-  catch (e) {
-    return null;
-  }
-  return null;
+  return fetch(parsed.href, {
+    method: 'HEAD',
+    mode: 'no-cors',
+    redirect: 'follow',
+  })
+    .then(response => response.ok)
+    .catch(() => false);
 };
 
 /*
@@ -137,63 +146,10 @@ const /* void */ forceCreateDirectory = (dir) => {
   }
 };
 
-/* Get the current process name */
-const PROCESS_NAME = paths.basename(process.argv0);
 
-/* Initialise logging */
-const LOG_LEVEL_NONE = 0;
-const LOG_LEVEL_ERROR = 1;
-const LOG_LEVEL_WARN = 2;
-const LOG_LEVEL_INFO = 3;
-const LOG_LEVEL_DEBUG = 4;
-const LOG_LEVEL_TRACE = 5;
-
-const LOG_LEVEL_MAP = {
-  NONE: LOG_LEVEL_NONE,
-  ERROR: LOG_LEVEL_ERROR,
-  WARN: LOG_LEVEL_WARN,
-  INFO: LOG_LEVEL_INFO,
-  DEBUG: LOG_LEVEL_DEBUG,
-  TRACE: LOG_LEVEL_TRACE,
-};
-
+/* Initialise logger */
 const logFile = paths.join(WORK_DIR, 'output.log');
-let _logLevel = 0;
-const logger = {
-  setLogLevel: (level) => {
-    _logLevel = level;
-  },
-  trace: (msg) => {
-    if (LOG_LEVEL_TRACE <= _logLevel) {
-      fs.appendFile(logFile, `[TRACE] [${process.pid}] ${util.format(msg)}\n`, () => {});
-      process.stdout.write(`${util.format(msg)}\n`);
-    }
-  },
-  debug: (msg) => {
-    if (LOG_LEVEL_DEBUG <= _logLevel) {
-      fs.appendFile(logFile, `[DEBUG] [${process.pid}] ${util.format(msg)}\n`, () => {});
-      process.stdout.write(`${util.format(msg)}\n`);
-    }
-  },
-  info: (msg) => {
-    if (LOG_LEVEL_INFO <= _logLevel) {
-      fs.appendFile(logFile, `[INFO] [${process.pid}] ${util.format(msg)}\n`, () => {});
-      process.stdout.write(`${util.format(msg)}\n`);
-    }
-  },
-  warn: (msg) => {
-    if (LOG_LEVEL_WARN <= _logLevel) {
-      fs.appendFile(logFile, `[WARN] [${process.pid}] ${util.format(msg)}\n`, () => {});
-      process.stdout.write(`${util.format(msg)}\n`);
-    }
-  },
-  error: (msg) => {
-    if (LOG_LEVEL_ERROR <= _logLevel) {
-      fs.appendFile(logFile, `[ERROR] [${process.pid}] ${util.format(msg)}\n`, () => {});
-      process.stderr.write(`${util.format(msg)}\n`);
-    }
-  },
-};
+logger.setLogFile(logFile);
 
 /**
  * Main routine
@@ -216,12 +172,13 @@ const logger = {
     logLevel,
   } = argv;
 
-  logger.setLogLevel(LOG_LEVEL_MAP[logLevel]);
+  logger.setLogLevel(logLevel);
 
-  const parsedUrl = parseUrl(url);
-  if (!parsedUrl) {
-    logger.error(`Invalid URL: ${url}`);
+  const isUrlValid = await validateUrl(url);
+  if (!isUrlValid) {
+    logger.error(`Invalid or unreachable URL: ${url}`);
     app.quit();
+    return;
   }
 
   const createWindow = (onClose) => {
@@ -265,6 +222,7 @@ const logger = {
 
   app.on('window-all-closed', () => {
     app.quit();
+    return;
   });
 
   app.on('quit', () => {
@@ -308,21 +266,20 @@ const logger = {
         const pid = fs.readFileSync(lockFile, 'utf8');
         logger.debug(`Lock content: ${pid}`);
         const proc = await findProcess(pid);
-        logger.debug(`PID corresponds to: ${proc? proc.name : null}`);
+        logger.debug(`PID corresponds to: ${proc ? proc.name : null}`);
         if (proc && proc.name === PROCESS_NAME) {
           logger.error(`Instance '${singleton}' is already running.`);
           /* Send the focus signal to the already existing singleton instance. */
           fs.writeFileSync(commFile, 'focus\n');
           app.quit();
+          return;
         }
         /* In the scenario where the lock is not cleaned up correctly,
          * and we cannot find an electron process with the given PID,
          * remove the lock. */
-        else {
-          logger.debug(`Bad lock. Removing it.`);
-          rimraf.sync(lockFile);
-          isLocked = false;
-        }
+        logger.debug(`Bad lock. Removing it.`);
+        rimraf.sync(lockFile);
+        isLocked = false;
       }
     }
     else {
@@ -338,6 +295,7 @@ const logger = {
         if (err) {
           logger.error(`Unable to create lock for instance ${singleton}.`);
           app.quit();
+          return;
         }
       });
 
