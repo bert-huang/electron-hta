@@ -3,372 +3,371 @@
     <Product Id="DEDC0CB2-77B3-4622-8829-68997F07D177" Name="Electron URL Launcher" Language="1033" Version="1.0.0.0" Manufacturer="CEPW" UpgradeCode="D47B2416-5D83-4EBD-9DCC-40F05E542516">
         <Package Description="Electron URL Launcher" Comments="This installer database contains the logic and data required to install Electron URL Launcher." InstallerVersion="200" Compressed="yes" Platform="x86" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Condition Message="This application is only supported on Windows 7, Windows Server 2008 R2, or higher.">Installed OR (VersionNT &gt;= 601)</Condition>
+        <Condition Message="A later version of [ProductName] is already installed. Setup will now exit.">NOT WIX_DOWNGRADE_DETECTED</Condition>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLDIR" Name="Electron URL Launcher">
                     <Component Id="EnvironmentPath" Guid="3181FF99-A19F-4BFE-8EF7-464D98052171" KeyPath="yes">
                         <Environment Id="EnvironmentPath" Name="PATH" Value="[INSTALLDIR]" Separator=";" Action="set" Part="last" System="yes" Permanent="no" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_CONSOLE_L1_1_0.DLL" DiskId="1" Guid="32A71DF8-F437-42C0-B309-E1D93CBDDEE2">
+                    <Component Id="API_MS_WIN_CORE_CONSOLE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_CONSOLE_L1_1_0.DLL" Name="api-ms-win-core-console-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-console-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_DATETIME_L1_1_0.DLL" DiskId="1" Guid="B8F6B978-B7E5-48B1-9755-A9B6C2A23C41">
+                    <Component Id="API_MS_WIN_CORE_DATETIME_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_DATETIME_L1_1_0.DLL" Name="api-ms-win-core-datetime-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-datetime-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_DEBUG_L1_1_0.DLL" DiskId="1" Guid="CB44BD55-9250-48FB-9880-1354199DFB1F">
+                    <Component Id="API_MS_WIN_CORE_DEBUG_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_DEBUG_L1_1_0.DLL" Name="api-ms-win-core-debug-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-debug-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_ERRORHANDLING_L1_1_0.DLL" DiskId="1" Guid="45A309CA-56FD-45CA-9FEE-3556B79A7D01">
+                    <Component Id="API_MS_WIN_CORE_ERRORHANDLING_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_ERRORHANDLING_L1_1_0.DLL" Name="api-ms-win-core-errorhandling-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-errorhandling-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_FILE_L1_1_0.DLL" DiskId="1" Guid="2D39A4F3-E872-419C-B889-2ED73ECD598A">
+                    <Component Id="API_MS_WIN_CORE_FILE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_FILE_L1_1_0.DLL" Name="api-ms-win-core-file-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-file-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_FILE_L1_2_0.DLL" DiskId="1" Guid="01EFF0B9-943A-4413-B998-7C161B5DC15F">
+                    <Component Id="API_MS_WIN_CORE_FILE_L1_2_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_FILE_L1_2_0.DLL" Name="api-ms-win-core-file-l1-2-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-file-l1-2-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_FILE_L2_1_0.DLL" DiskId="1" Guid="88AE6102-C524-4D94-BE71-2FFEE580B3DC">
+                    <Component Id="API_MS_WIN_CORE_FILE_L2_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_FILE_L2_1_0.DLL" Name="api-ms-win-core-file-l2-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-file-l2-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_HANDLE_L1_1_0.DLL" DiskId="1" Guid="3B2F718B-54E6-40F9-9A56-F642E653DE0B">
+                    <Component Id="API_MS_WIN_CORE_HANDLE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_HANDLE_L1_1_0.DLL" Name="api-ms-win-core-handle-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-handle-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_HEAP_L1_1_0.DLL" DiskId="1" Guid="94A87AD6-B3D3-431A-9B5B-47FB9DAFB94D">
+                    <Component Id="API_MS_WIN_CORE_HEAP_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_HEAP_L1_1_0.DLL" Name="api-ms-win-core-heap-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-heap-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_INTERLOCKED_L1_1_0.DLL" DiskId="1" Guid="F8824B68-EA36-4398-A625-E571BF8FDBD3">
+                    <Component Id="API_MS_WIN_CORE_INTERLOCKED_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_INTERLOCKED_L1_1_0.DLL" Name="api-ms-win-core-interlocked-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-interlocked-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_LIBRARYLOADER_L1_1_0.DLL" DiskId="1" Guid="E492E91D-DEC9-40BA-82E3-01508610F0E4">
+                    <Component Id="API_MS_WIN_CORE_LIBRARYLOADER_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_LIBRARYLOADER_L1_1_0.DLL" Name="api-ms-win-core-libraryloader-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-libraryloader-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_LOCALIZATION_L1_2_0.DLL" DiskId="1" Guid="A3ABD461-6347-457F-BB19-E9E8EC0729F7">
+                    <Component Id="API_MS_WIN_CORE_LOCALIZATION_L1_2_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_LOCALIZATION_L1_2_0.DLL" Name="api-ms-win-core-localization-l1-2-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-localization-l1-2-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_MEMORY_L1_1_0.DLL" DiskId="1" Guid="4B450BCA-108C-46DA-8CBC-414E11EC1508">
+                    <Component Id="API_MS_WIN_CORE_MEMORY_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_MEMORY_L1_1_0.DLL" Name="api-ms-win-core-memory-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-memory-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_NAMEDPIPE_L1_1_0.DLL" DiskId="1" Guid="5E204B39-E8A2-4E92-B63D-C8AE98E8A28A">
+                    <Component Id="API_MS_WIN_CORE_NAMEDPIPE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_NAMEDPIPE_L1_1_0.DLL" Name="api-ms-win-core-namedpipe-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-namedpipe-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_PROCESSENVIRONMENT_L1_1_0.DLL" DiskId="1" Guid="D83C0FA9-5173-4B67-BE20-D277F5FCA7F2">
+                    <Component Id="API_MS_WIN_CORE_PROCESSENVIRONMENT_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_PROCESSENVIRONMENT_L1_1_0.DLL" Name="api-ms-win-core-processenvironment-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-processenvironment-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_PROCESSTHREADS_L1_1_0.DLL" DiskId="1" Guid="4D4214D0-5F4D-4A10-8FEA-D6C463EF8F81">
+                    <Component Id="API_MS_WIN_CORE_PROCESSTHREADS_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_PROCESSTHREADS_L1_1_0.DLL" Name="api-ms-win-core-processthreads-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-processthreads-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_PROCESSTHREADS_L1_1_1.DLL" DiskId="1" Guid="33C4EEBA-56A5-4CB1-98D8-998120255D6C">
+                    <Component Id="API_MS_WIN_CORE_PROCESSTHREADS_L1_1_1.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_PROCESSTHREADS_L1_1_1.DLL" Name="api-ms-win-core-processthreads-l1-1-1.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-processthreads-l1-1-1.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_PROFILE_L1_1_0.DLL" DiskId="1" Guid="E2B67884-1E9F-4E8D-9B88-FD37AFD91B96">
+                    <Component Id="API_MS_WIN_CORE_PROFILE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_PROFILE_L1_1_0.DLL" Name="api-ms-win-core-profile-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-profile-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_RTLSUPPORT_L1_1_0.DLL" DiskId="1" Guid="05398E9D-1EDE-4271-8162-9DD6760BD366">
+                    <Component Id="API_MS_WIN_CORE_RTLSUPPORT_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_RTLSUPPORT_L1_1_0.DLL" Name="api-ms-win-core-rtlsupport-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-rtlsupport-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_STRING_L1_1_0.DLL" DiskId="1" Guid="AA9755C0-1D19-411C-A3DB-8DA8FFF75204">
+                    <Component Id="API_MS_WIN_CORE_STRING_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_STRING_L1_1_0.DLL" Name="api-ms-win-core-string-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-string-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_SYNCH_L1_1_0.DLL" DiskId="1" Guid="00DD017D-5E70-4FAA-BB01-839EF6D2141B">
+                    <Component Id="API_MS_WIN_CORE_SYNCH_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_SYNCH_L1_1_0.DLL" Name="api-ms-win-core-synch-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-synch-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_SYNCH_L1_2_0.DLL" DiskId="1" Guid="DC5B80AD-E6DD-449B-8326-A97A86A64ECC">
+                    <Component Id="API_MS_WIN_CORE_SYNCH_L1_2_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_SYNCH_L1_2_0.DLL" Name="api-ms-win-core-synch-l1-2-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-synch-l1-2-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_SYSINFO_L1_1_0.DLL" DiskId="1" Guid="0CD4801D-BAE6-414E-B15C-F1CB64A6527D">
+                    <Component Id="API_MS_WIN_CORE_SYSINFO_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_SYSINFO_L1_1_0.DLL" Name="api-ms-win-core-sysinfo-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-sysinfo-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_TIMEZONE_L1_1_0.DLL" DiskId="1" Guid="A5089A30-313E-4976-84A6-88AAF3AA72D9">
+                    <Component Id="API_MS_WIN_CORE_TIMEZONE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_TIMEZONE_L1_1_0.DLL" Name="api-ms-win-core-timezone-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-timezone-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CORE_UTIL_L1_1_0.DLL" DiskId="1" Guid="5FB21E45-5C97-4FB7-9F34-A801FE1FA7A1">
+                    <Component Id="API_MS_WIN_CORE_UTIL_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CORE_UTIL_L1_1_0.DLL" Name="api-ms-win-core-util-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-core-util-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_CONIO_L1_1_0.DLL" DiskId="1" Guid="FA1E20D4-F14E-4B28-A849-2D418488CD9A">
+                    <Component Id="API_MS_WIN_CRT_CONIO_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_CONIO_L1_1_0.DLL" Name="api-ms-win-crt-conio-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-conio-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_CONVERT_L1_1_0.DLL" DiskId="1" Guid="6CE7BF0C-5A50-4AB4-A67B-F3B95D3B03EC">
+                    <Component Id="API_MS_WIN_CRT_CONVERT_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_CONVERT_L1_1_0.DLL" Name="api-ms-win-crt-convert-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-convert-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_ENVIRONMENT_L1_1_0.DLL" DiskId="1" Guid="C0D32E75-9434-41BA-B18B-15874C38D495">
+                    <Component Id="API_MS_WIN_CRT_ENVIRONMENT_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_ENVIRONMENT_L1_1_0.DLL" Name="api-ms-win-crt-environment-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-environment-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_FILESYSTEM_L1_1_0.DLL" DiskId="1" Guid="869BC760-5DD0-4124-8A1D-5FEAFEBA976A">
+                    <Component Id="API_MS_WIN_CRT_FILESYSTEM_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_FILESYSTEM_L1_1_0.DLL" Name="api-ms-win-crt-filesystem-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-filesystem-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_HEAP_L1_1_0.DLL" DiskId="1" Guid="6D10B496-4033-401F-AA58-57EA1803A35E">
+                    <Component Id="API_MS_WIN_CRT_HEAP_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_HEAP_L1_1_0.DLL" Name="api-ms-win-crt-heap-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-heap-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_LOCALE_L1_1_0.DLL" DiskId="1" Guid="0256CD33-78A3-42C0-8485-37C93E08EC22">
+                    <Component Id="API_MS_WIN_CRT_LOCALE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_LOCALE_L1_1_0.DLL" Name="api-ms-win-crt-locale-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-locale-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_MATH_L1_1_0.DLL" DiskId="1" Guid="2FE0672E-841B-4611-A72F-A95A74621410">
+                    <Component Id="API_MS_WIN_CRT_MATH_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_MATH_L1_1_0.DLL" Name="api-ms-win-crt-math-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-math-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_MULTIBYTE_L1_1_0.DLL" DiskId="1" Guid="64DE6DD8-8341-463E-A275-09CC8E3E1645">
+                    <Component Id="API_MS_WIN_CRT_MULTIBYTE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_MULTIBYTE_L1_1_0.DLL" Name="api-ms-win-crt-multibyte-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-multibyte-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_PRIVATE_L1_1_0.DLL" DiskId="1" Guid="2A42C8E9-6201-4A98-956E-7C13FF0DC299">
+                    <Component Id="API_MS_WIN_CRT_PRIVATE_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_PRIVATE_L1_1_0.DLL" Name="api-ms-win-crt-private-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-private-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_PROCESS_L1_1_0.DLL" DiskId="1" Guid="7CAC418E-1434-4360-AC46-B9B9E0208BB9">
+                    <Component Id="API_MS_WIN_CRT_PROCESS_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_PROCESS_L1_1_0.DLL" Name="api-ms-win-crt-process-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-process-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_RUNTIME_L1_1_0.DLL" DiskId="1" Guid="D9A16382-97E3-4E5B-A1D2-07230E43EDED">
+                    <Component Id="API_MS_WIN_CRT_RUNTIME_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_RUNTIME_L1_1_0.DLL" Name="api-ms-win-crt-runtime-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-runtime-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_STDIO_L1_1_0.DLL" DiskId="1" Guid="3ABF9C9E-551B-4A93-94F0-D320A335ABE8">
+                    <Component Id="API_MS_WIN_CRT_STDIO_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_STDIO_L1_1_0.DLL" Name="api-ms-win-crt-stdio-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-stdio-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_STRING_L1_1_0.DLL" DiskId="1" Guid="DDF3A909-28A5-49C9-B499-E09CFD708163">
+                    <Component Id="API_MS_WIN_CRT_STRING_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_STRING_L1_1_0.DLL" Name="api-ms-win-crt-string-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-string-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_TIME_L1_1_0.DLL" DiskId="1" Guid="93B0ED39-5101-415F-80A6-91F969C2CF2D">
+                    <Component Id="API_MS_WIN_CRT_TIME_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_TIME_L1_1_0.DLL" Name="api-ms-win-crt-time-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-time-l1-1-0.dll" />
                     </Component>
-                    <Component Id="API_MS_WIN_CRT_UTILITY_L1_1_0.DLL" DiskId="1" Guid="CEEC893E-45EA-4C86-A40C-8677F2B5B4E2">
+                    <Component Id="API_MS_WIN_CRT_UTILITY_L1_1_0.DLL" DiskId="1" Guid="*">
                         <File Id="API_MS_WIN_CRT_UTILITY_L1_1_0.DLL" Name="api-ms-win-crt-utility-l1-1-0.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\api-ms-win-crt-utility-l1-1-0.dll" />
                     </Component>
-                    <Component Id="BLINK_IMAGE_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="D0D4C5B4-F649-4908-AD63-FAB62CB1152A">
+                    <Component Id="BLINK_IMAGE_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="*">
                         <File Id="BLINK_IMAGE_RESOURCES_200_PERCENT.PAK" Name="blink_image_resources_200_percent.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\blink_image_resources_200_percent.pak" />
                     </Component>
-                    <Component Id="CONTENT_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="489ADC77-A9D6-43D5-B8BC-A1279CB10B8A">
+                    <Component Id="CONTENT_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="*">
                         <File Id="CONTENT_RESOURCES_200_PERCENT.PAK" Name="content_resources_200_percent.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\content_resources_200_percent.pak" />
                     </Component>
-                    <Component Id="CONTENT_SHELL.PAK" DiskId="1" Guid="14F0A84D-F55D-4E8B-92E5-129E044E3E4C">
+                    <Component Id="CONTENT_SHELL.PAK" DiskId="1" Guid="*">
                         <File Id="CONTENT_SHELL.PAK" Name="content_shell.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\content_shell.pak" />
                     </Component>
-                    <Component Id="D3DCOMPILER_47.DLL" DiskId="1" Guid="23FD792A-93CB-499F-9F06-71392A343C1A">
+                    <Component Id="D3DCOMPILER_47.DLL" DiskId="1" Guid="*">
                         <File Id="D3DCOMPILER_47.DLL" Name="d3dcompiler_47.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\d3dcompiler_47.dll" />
                     </Component>
-                    <Component Id="ELECTRON_URL_LAUNCHER.EXE" DiskId="1" Guid="300CCEB6-1107-4E9D-841D-88A60CB1FCA0">
-                        <File Id="ELECTRON_URL_LAUNCHER.EXE" Name="electron-url-launcher.exe" Source="..\release-builds\electron-url-launcher-win32-ia32\electron-url-launcher.exe">
-                            <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Electron URL Launcher" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="DesktopIcon.exe" IconIndex="0" />
-                        </File>
+                    <Component Id="ELECTRON_URL_LAUNCHER.EXE" DiskId="1" Guid="*">
+                        <File Id="ELECTRON_URL_LAUNCHER.EXE" Name="electron-url-launcher.exe" Source="..\release-builds\electron-url-launcher-win32-ia32\electron-url-launcher.exe" />
                     </Component>
-                    <Component Id="FFMPEG.DLL" DiskId="1" Guid="5E34B867-4FF6-4035-A1DE-B86CF6357308">
+                    <Component Id="FFMPEG.DLL" DiskId="1" Guid="*">
                         <File Id="FFMPEG.DLL" Name="ffmpeg.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\ffmpeg.dll" />
                     </Component>
-                    <Component Id="ICUDTL.DAT" DiskId="1" Guid="7E65ABED-A519-4DE0-A231-75F4B4551DBD">
+                    <Component Id="ICUDTL.DAT" DiskId="1" Guid="*">
                         <File Id="ICUDTL.DAT" Name="icudtl.dat" Source="..\release-builds\electron-url-launcher-win32-ia32\icudtl.dat" />
                     </Component>
-                    <Component Id="LIBEGL.DLL" DiskId="1" Guid="37B39165-6A8A-4B38-994A-AFCEB4A7C7B5">
+                    <Component Id="LIBEGL.DLL" DiskId="1" Guid="*">
                         <File Id="LIBEGL.DLL" Name="libEGL.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\libEGL.dll" />
                     </Component>
-                    <Component Id="LIBGLESV2.DLL" DiskId="1" Guid="23A5BE90-2C48-4339-8ECC-139037266A32">
+                    <Component Id="LIBGLESV2.DLL" DiskId="1" Guid="*">
                         <File Id="LIBGLESV2.DLL" Name="libGLESv2.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\libGLESv2.dll" />
                     </Component>
-                    <Component Id="LICENSE" DiskId="1" Guid="9450AB4B-3E84-4663-9D79-C87CC9244F20">
+                    <Component Id="LICENSE" DiskId="1" Guid="*">
                         <File Id="LICENSE" Name="LICENSE" Source="..\release-builds\electron-url-launcher-win32-ia32\LICENSE" />
                     </Component>
-                    <Component Id="LICENSES.CHROMIUM.HTML" DiskId="1" Guid="E95ADC12-8DC9-4808-BB8E-D198218507A7">
+                    <Component Id="LICENSES.CHROMIUM.HTML" DiskId="1" Guid="*">
                         <File Id="LICENSES.CHROMIUM.HTML" Name="LICENSES.chromium.html" Source="..\release-builds\electron-url-launcher-win32-ia32\LICENSES.chromium.html" />
                     </Component>
-                    <Component Id="MSVCP140.DLL" DiskId="1" Guid="4F5D3972-84C9-421B-AAB8-ECCDF8F24358">
+                    <Component Id="MSVCP140.DLL" DiskId="1" Guid="*">
                         <File Id="MSVCP140.DLL" Name="msvcp140.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\msvcp140.dll" />
                     </Component>
-                    <Component Id="NATIVES_BLOB.BIN" DiskId="1" Guid="65A0F82E-9241-402B-B2B6-2782361C6141">
+                    <Component Id="NATIVES_BLOB.BIN" DiskId="1" Guid="*">
                         <File Id="NATIVES_BLOB.BIN" Name="natives_blob.bin" Source="..\release-builds\electron-url-launcher-win32-ia32\natives_blob.bin" />
                     </Component>
-                    <Component Id="NODE.DLL" DiskId="1" Guid="AF35CDF5-AC5A-4179-92AC-E4766BF8ABBD">
+                    <Component Id="NODE.DLL" DiskId="1" Guid="*">
                         <File Id="NODE.DLL" Name="node.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\node.dll" />
                     </Component>
-                    <Component Id="PDF_VIEWER_RESOURCES.PAK" DiskId="1" Guid="88D01763-AC8A-42AD-98F8-D0907301AD06">
+                    <Component Id="PDF_VIEWER_RESOURCES.PAK" DiskId="1" Guid="*">
                         <File Id="PDF_VIEWER_RESOURCES.PAK" Name="pdf_viewer_resources.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\pdf_viewer_resources.pak" />
                     </Component>
-                    <Component Id="SNAPSHOT_BLOB.BIN" DiskId="1" Guid="49B390E4-2861-45E2-9BF3-D30AB3881AEC">
+                    <Component Id="SNAPSHOT_BLOB.BIN" DiskId="1" Guid="*">
                         <File Id="SNAPSHOT_BLOB.BIN" Name="snapshot_blob.bin" Source="..\release-builds\electron-url-launcher-win32-ia32\snapshot_blob.bin" />
                     </Component>
-                    <Component Id="UCRTBASE.DLL" DiskId="1" Guid="6BC6C1B6-4DDA-4E70-991B-691BD90F7BE6">
+                    <Component Id="UCRTBASE.DLL" DiskId="1" Guid="*">
                         <File Id="UCRTBASE.DLL" Name="ucrtbase.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\ucrtbase.dll" />
                     </Component>
-                    <Component Id="UI_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="53DC84FF-1B3A-43F0-8FB9-DA0FADB16B64">
+                    <Component Id="UI_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="*">
                         <File Id="UI_RESOURCES_200_PERCENT.PAK" Name="ui_resources_200_percent.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\ui_resources_200_percent.pak" />
                     </Component>
-                    <Component Id="VCRUNTIME140.DLL" DiskId="1" Guid="B148EC4F-6511-46FC-BE4B-E4FC525794F2">
+                    <Component Id="VCRUNTIME140.DLL" DiskId="1" Guid="*">
                         <File Id="VCRUNTIME140.DLL" Name="vcruntime140.dll" Source="..\release-builds\electron-url-launcher-win32-ia32\vcruntime140.dll" />
                     </Component>
-                    <Component Id="VERSION" DiskId="1" Guid="FDCCA932-8584-4420-8D59-8E99A906B6E1">
+                    <Component Id="VERSION" DiskId="1" Guid="*">
                         <File Id="VERSION" Name="version" Source="..\release-builds\electron-url-launcher-win32-ia32\version" />
                     </Component>
-                    <Component Id="VIEWS_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="EBF5366A-6BBF-48F5-BD5C-3CEBB9001C10">
+                    <Component Id="VIEWS_RESOURCES_200_PERCENT.PAK" DiskId="1" Guid="*">
                         <File Id="VIEWS_RESOURCES_200_PERCENT.PAK" Name="views_resources_200_percent.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\views_resources_200_percent.pak" />
                     </Component>
                     <Directory Id="LOCALES" Name="locales">
-                        <Component Id="AM.PAK" DiskId="1" Guid="9E98FDD0-34E7-4138-ABFE-0A557417FA55">
+                        <Component Id="AM.PAK" DiskId="1" Guid="*">
                             <File Id="AM.PAK" Name="am.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\am.pak" />
                         </Component>
-                        <Component Id="AR.PAK" DiskId="1" Guid="E0CC27D8-228F-4C79-A34E-97D46A3EBBBF">
+                        <Component Id="AR.PAK" DiskId="1" Guid="*">
                             <File Id="AR.PAK" Name="ar.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ar.pak" />
                         </Component>
-                        <Component Id="BG.PAK" DiskId="1" Guid="96353377-B7DA-48F0-9FC7-B67B1AC2F27F">
+                        <Component Id="BG.PAK" DiskId="1" Guid="*">
                             <File Id="BG.PAK" Name="bg.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\bg.pak" />
                         </Component>
-                        <Component Id="BN.PAK" DiskId="1" Guid="6C7876E8-3DAA-434E-9982-3F54CB3819E4">
+                        <Component Id="BN.PAK" DiskId="1" Guid="*">
                             <File Id="BN.PAK" Name="bn.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\bn.pak" />
                         </Component>
-                        <Component Id="CA.PAK" DiskId="1" Guid="900A2F28-1EC4-4301-8CBD-172CEB9339DB">
+                        <Component Id="CA.PAK" DiskId="1" Guid="*">
                             <File Id="CA.PAK" Name="ca.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ca.pak" />
                         </Component>
-                        <Component Id="CS.PAK" DiskId="1" Guid="272CC665-E4D1-414F-9F00-D52748489F96">
+                        <Component Id="CS.PAK" DiskId="1" Guid="*">
                             <File Id="CS.PAK" Name="cs.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\cs.pak" />
                         </Component>
-                        <Component Id="DA.PAK" DiskId="1" Guid="F9664285-7C02-44FC-B44C-87225C27E884">
+                        <Component Id="DA.PAK" DiskId="1" Guid="*">
                             <File Id="DA.PAK" Name="da.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\da.pak" />
                         </Component>
-                        <Component Id="DE.PAK" DiskId="1" Guid="019CF5BB-DE54-412E-85D3-D85008676D7A">
+                        <Component Id="DE.PAK" DiskId="1" Guid="*">
                             <File Id="DE.PAK" Name="de.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\de.pak" />
                         </Component>
-                        <Component Id="EL.PAK" DiskId="1" Guid="0C580BEB-25AE-4B71-9998-6682C92821B7">
+                        <Component Id="EL.PAK" DiskId="1" Guid="*">
                             <File Id="EL.PAK" Name="el.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\el.pak" />
                         </Component>
-                        <Component Id="EN_GB.PAK" DiskId="1" Guid="C36DC1F3-A20B-4834-B995-5B089B99A3E1">
+                        <Component Id="EN_GB.PAK" DiskId="1" Guid="*">
                             <File Id="EN_GB.PAK" Name="en-GB.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\en-GB.pak" />
                         </Component>
-                        <Component Id="EN_US.PAK" DiskId="1" Guid="CE08730C-421D-4A51-9394-EEE102339BEC">
+                        <Component Id="EN_US.PAK" DiskId="1" Guid="*">
                             <File Id="EN_US.PAK" Name="en-US.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\en-US.pak" />
                         </Component>
-                        <Component Id="ES_419.PAK" DiskId="1" Guid="A11C09EA-78F0-49EB-B560-D1B45FE6C4EA">
+                        <Component Id="ES_419.PAK" DiskId="1" Guid="*">
                             <File Id="ES_419.PAK" Name="es-419.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\es-419.pak" />
                         </Component>
-                        <Component Id="ES.PAK" DiskId="1" Guid="5125810F-379A-43FF-A949-D7F8AE47AFBF">
+                        <Component Id="ES.PAK" DiskId="1" Guid="*">
                             <File Id="ES.PAK" Name="es.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\es.pak" />
                         </Component>
-                        <Component Id="ET.PAK" DiskId="1" Guid="F8F7E392-3BF8-4764-A1DF-C8C3369D4FF6">
+                        <Component Id="ET.PAK" DiskId="1" Guid="*">
                             <File Id="ET.PAK" Name="et.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\et.pak" />
                         </Component>
-                        <Component Id="FA.PAK" DiskId="1" Guid="3BAA3898-0D0B-44D4-977F-59B68462F512">
+                        <Component Id="FA.PAK" DiskId="1" Guid="*">
                             <File Id="FA.PAK" Name="fa.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\fa.pak" />
                         </Component>
-                        <Component Id="FAKE_BIDI.PAK" DiskId="1" Guid="A8745CB2-5037-4F8A-9C79-C4D6871AF8FB">
+                        <Component Id="FAKE_BIDI.PAK" DiskId="1" Guid="*">
                             <File Id="FAKE_BIDI.PAK" Name="fake-bidi.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\fake-bidi.pak" />
                         </Component>
-                        <Component Id="FI.PAK" DiskId="1" Guid="C30175B8-3427-4E71-A2DE-33C39920CBE7">
+                        <Component Id="FI.PAK" DiskId="1" Guid="*">
                             <File Id="FI.PAK" Name="fi.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\fi.pak" />
                         </Component>
-                        <Component Id="FIL.PAK" DiskId="1" Guid="C1BA86C7-A670-4DEB-BE3D-F86D200B2BE5">
+                        <Component Id="FIL.PAK" DiskId="1" Guid="*">
                             <File Id="FIL.PAK" Name="fil.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\fil.pak" />
                         </Component>
-                        <Component Id="FR.PAK" DiskId="1" Guid="B41CBA53-6069-4C37-86ED-CB1204C16033">
+                        <Component Id="FR.PAK" DiskId="1" Guid="*">
                             <File Id="FR.PAK" Name="fr.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\fr.pak" />
                         </Component>
-                        <Component Id="GU.PAK" DiskId="1" Guid="7C4A7695-A32F-43D5-B723-4FD8B4B9150E">
+                        <Component Id="GU.PAK" DiskId="1" Guid="*">
                             <File Id="GU.PAK" Name="gu.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\gu.pak" />
                         </Component>
-                        <Component Id="HE.PAK" DiskId="1" Guid="931D6D7E-D6B1-4BF7-81D0-E52C12F23EAD">
+                        <Component Id="HE.PAK" DiskId="1" Guid="*">
                             <File Id="HE.PAK" Name="he.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\he.pak" />
                         </Component>
-                        <Component Id="HI.PAK" DiskId="1" Guid="2AF1B2C6-B44A-426C-9709-9E95FB3B4542">
+                        <Component Id="HI.PAK" DiskId="1" Guid="*">
                             <File Id="HI.PAK" Name="hi.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\hi.pak" />
                         </Component>
-                        <Component Id="HR.PAK" DiskId="1" Guid="6922F29E-0EFB-4C51-9CC2-1432C6F7EAF5">
+                        <Component Id="HR.PAK" DiskId="1" Guid="*">
                             <File Id="HR.PAK" Name="hr.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\hr.pak" />
                         </Component>
-                        <Component Id="HU.PAK" DiskId="1" Guid="63D09CB9-7AF9-4D42-8020-6351D928A6A8">
+                        <Component Id="HU.PAK" DiskId="1" Guid="*">
                             <File Id="HU.PAK" Name="hu.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\hu.pak" />
                         </Component>
-                        <Component Id="ID.PAK" DiskId="1" Guid="01A07921-861E-4569-B6F6-2021D6B46833">
+                        <Component Id="ID.PAK" DiskId="1" Guid="*">
                             <File Id="ID.PAK" Name="id.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\id.pak" />
                         </Component>
-                        <Component Id="IT.PAK" DiskId="1" Guid="C11947B9-3160-4CF1-9855-A7FFD7A74C70">
+                        <Component Id="IT.PAK" DiskId="1" Guid="*">
                             <File Id="IT.PAK" Name="it.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\it.pak" />
                         </Component>
-                        <Component Id="JA.PAK" DiskId="1" Guid="37029CD9-0138-4DC9-B3DF-4B9E928AFCCE">
+                        <Component Id="JA.PAK" DiskId="1" Guid="*">
                             <File Id="JA.PAK" Name="ja.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ja.pak" />
                         </Component>
-                        <Component Id="KN.PAK" DiskId="1" Guid="56C5BE90-EFB7-45C5-9A49-0B271184C890">
+                        <Component Id="KN.PAK" DiskId="1" Guid="*">
                             <File Id="KN.PAK" Name="kn.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\kn.pak" />
                         </Component>
-                        <Component Id="KO.PAK" DiskId="1" Guid="CCCD9128-4CF7-4F2A-870B-99C66093E40D">
+                        <Component Id="KO.PAK" DiskId="1" Guid="*">
                             <File Id="KO.PAK" Name="ko.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ko.pak" />
                         </Component>
-                        <Component Id="LT.PAK" DiskId="1" Guid="2D4D79E7-B5C0-4ED0-954A-15887D7266CB">
+                        <Component Id="LT.PAK" DiskId="1" Guid="*">
                             <File Id="LT.PAK" Name="lt.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\lt.pak" />
                         </Component>
-                        <Component Id="LV.PAK" DiskId="1" Guid="5BF4894D-B465-49C9-A7BA-D21344A86450">
+                        <Component Id="LV.PAK" DiskId="1" Guid="*">
                             <File Id="LV.PAK" Name="lv.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\lv.pak" />
                         </Component>
-                        <Component Id="ML.PAK" DiskId="1" Guid="C7B1C952-5EB7-4B7F-87C9-526EF02D6461">
+                        <Component Id="ML.PAK" DiskId="1" Guid="*">
                             <File Id="ML.PAK" Name="ml.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ml.pak" />
                         </Component>
-                        <Component Id="MR.PAK" DiskId="1" Guid="BE21A224-3ABD-4B70-B51A-0C15BCE440A2">
+                        <Component Id="MR.PAK" DiskId="1" Guid="*">
                             <File Id="MR.PAK" Name="mr.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\mr.pak" />
                         </Component>
-                        <Component Id="MS.PAK" DiskId="1" Guid="32BF7D8D-89D5-4A70-AA5A-0DA07495276C">
+                        <Component Id="MS.PAK" DiskId="1" Guid="*">
                             <File Id="MS.PAK" Name="ms.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ms.pak" />
                         </Component>
-                        <Component Id="NB.PAK" DiskId="1" Guid="C8D2ECCF-3CCA-414F-96E6-0C13F1029F03">
+                        <Component Id="NB.PAK" DiskId="1" Guid="*">
                             <File Id="NB.PAK" Name="nb.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\nb.pak" />
                         </Component>
-                        <Component Id="NL.PAK" DiskId="1" Guid="EFACCAF0-044B-4CAE-8E53-459444BBDD54">
+                        <Component Id="NL.PAK" DiskId="1" Guid="*">
                             <File Id="NL.PAK" Name="nl.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\nl.pak" />
                         </Component>
-                        <Component Id="PL.PAK" DiskId="1" Guid="AABA222A-6DC1-4086-B2DB-6338D4FD99B9">
+                        <Component Id="PL.PAK" DiskId="1" Guid="*">
                             <File Id="PL.PAK" Name="pl.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\pl.pak" />
                         </Component>
-                        <Component Id="PT_BR.PAK" DiskId="1" Guid="33B31CE4-5DE2-4D32-AD65-C7C6A0DE09CA">
+                        <Component Id="PT_BR.PAK" DiskId="1" Guid="*">
                             <File Id="PT_BR.PAK" Name="pt-BR.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\pt-BR.pak" />
                         </Component>
-                        <Component Id="PT_PT.PAK" DiskId="1" Guid="40439401-A8BA-4895-A5E0-3DE46EB93AF8">
+                        <Component Id="PT_PT.PAK" DiskId="1" Guid="*">
                             <File Id="PT_PT.PAK" Name="pt-PT.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\pt-PT.pak" />
                         </Component>
-                        <Component Id="RO.PAK" DiskId="1" Guid="6BAE7284-3538-40EF-BBD5-9D67C88ED998">
+                        <Component Id="RO.PAK" DiskId="1" Guid="*">
                             <File Id="RO.PAK" Name="ro.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ro.pak" />
                         </Component>
-                        <Component Id="RU.PAK" DiskId="1" Guid="7375450F-9444-4B11-9E29-F1B598E66566">
+                        <Component Id="RU.PAK" DiskId="1" Guid="*">
                             <File Id="RU.PAK" Name="ru.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ru.pak" />
                         </Component>
-                        <Component Id="SK.PAK" DiskId="1" Guid="D0D54279-9318-4889-AE50-4C0A323F90E4">
+                        <Component Id="SK.PAK" DiskId="1" Guid="*">
                             <File Id="SK.PAK" Name="sk.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\sk.pak" />
                         </Component>
-                        <Component Id="SL.PAK" DiskId="1" Guid="36935FF1-6DAA-48D2-A27E-9A638AEC2670">
+                        <Component Id="SL.PAK" DiskId="1" Guid="*">
                             <File Id="SL.PAK" Name="sl.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\sl.pak" />
                         </Component>
-                        <Component Id="SR.PAK" DiskId="1" Guid="424A6CB2-B335-4E73-8094-06A3491F31B1">
+                        <Component Id="SR.PAK" DiskId="1" Guid="*">
                             <File Id="SR.PAK" Name="sr.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\sr.pak" />
                         </Component>
-                        <Component Id="SV.PAK" DiskId="1" Guid="437C7702-8D83-445D-A3F9-B09811731CE5">
+                        <Component Id="SV.PAK" DiskId="1" Guid="*">
                             <File Id="SV.PAK" Name="sv.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\sv.pak" />
                         </Component>
-                        <Component Id="SW.PAK" DiskId="1" Guid="B18BCD4E-557C-44D6-86A6-7A39284F99FB">
+                        <Component Id="SW.PAK" DiskId="1" Guid="*">
                             <File Id="SW.PAK" Name="sw.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\sw.pak" />
                         </Component>
-                        <Component Id="TA.PAK" DiskId="1" Guid="D02EEA64-019F-459A-B3D7-C9522DF6F5F9">
+                        <Component Id="TA.PAK" DiskId="1" Guid="*">
                             <File Id="TA.PAK" Name="ta.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\ta.pak" />
                         </Component>
-                        <Component Id="TE.PAK" DiskId="1" Guid="04570ECE-3BE1-47B5-8B1E-C6BE5733C471">
+                        <Component Id="TE.PAK" DiskId="1" Guid="*">
                             <File Id="TE.PAK" Name="te.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\te.pak" />
                         </Component>
-                        <Component Id="TH.PAK" DiskId="1" Guid="FEA01915-5FCE-4623-9C18-C20FE78D65AB">
+                        <Component Id="TH.PAK" DiskId="1" Guid="*">
                             <File Id="TH.PAK" Name="th.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\th.pak" />
                         </Component>
-                        <Component Id="TR.PAK" DiskId="1" Guid="2BBC2E9D-5607-4229-B8CC-098AFD697BA8">
+                        <Component Id="TR.PAK" DiskId="1" Guid="*">
                             <File Id="TR.PAK" Name="tr.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\tr.pak" />
                         </Component>
-                        <Component Id="UK.PAK" DiskId="1" Guid="5B95C237-8DE1-4A6D-A7CD-039AE632E597">
+                        <Component Id="UK.PAK" DiskId="1" Guid="*">
                             <File Id="UK.PAK" Name="uk.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\uk.pak" />
                         </Component>
-                        <Component Id="VI.PAK" DiskId="1" Guid="D2E41D8F-C9AF-415A-B682-BCE06458FE9D">
+                        <Component Id="VI.PAK" DiskId="1" Guid="*">
                             <File Id="VI.PAK" Name="vi.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\vi.pak" />
                         </Component>
-                        <Component Id="ZH_CN.PAK" DiskId="1" Guid="3912A982-D6B9-49E7-96DB-A5DC84FF2DB9">
+                        <Component Id="ZH_CN.PAK" DiskId="1" Guid="*">
                             <File Id="ZH_CN.PAK" Name="zh-CN.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\zh-CN.pak" />
                         </Component>
-                        <Component Id="ZH_TW.PAK" DiskId="1" Guid="5D94C4E7-B8C7-4CBC-9EAF-918A8EF4535F">
+                        <Component Id="ZH_TW.PAK" DiskId="1" Guid="*">
                             <File Id="ZH_TW.PAK" Name="zh-TW.pak" Source="..\release-builds\electron-url-launcher-win32-ia32\locales\zh-TW.pak" />
                         </Component>
                     </Directory>
                     <Directory Id="RESOURCES" Name="resources">
-                        <Component Id="APP.ASAR" DiskId="1" Guid="74DD35C0-B278-4FD2-ADAD-D49CD5A16975">
+                        <Component Id="APP.ASAR" DiskId="1" Guid="*">
                             <File Id="APP.ASAR" Name="app.asar" Source="..\release-builds\electron-url-launcher-win32-ia32\resources\app.asar" />
                         </Component>
-                        <Component Id="ELECTRON.ASAR" DiskId="1" Guid="ADFCB0D6-E65A-4636-81FA-D4AA4070D609">
+                        <Component Id="ELECTRON.ASAR" DiskId="1" Guid="*">
                             <File Id="ELECTRON.ASAR" Name="electron.asar" Source="..\release-builds\electron-url-launcher-win32-ia32\resources\electron.asar" />
                         </Component>
                     </Directory>
                 </Directory>
             </Directory>
-            <Directory Id="DesktopFolder" />
         </Directory>
         <Feature Id="DefaultFeature" Title="Core" Level="1">
             <ComponentRef Id="API_MS_WIN_CORE_CONSOLE_L1_1_0.DLL" />
@@ -534,7 +533,14 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
         </UI>
         <UIRef Id="WixUI_Common" />
-        <Icon Id="DesktopIcon.exe" SourceFile="..\release-builds\electron-url-launcher-win32-ia32\electron-url-launcher.exe" />
-        <Condition Message="This application is only supported on Windows 7, Windows Server 2008 R2, or higher.">Installed OR (VersionNT &gt;= 601)</Condition>
+        <Property Id="WIX_DOWNGRADE_DETECTED" Secure="yes" />
+        <Property Id="WIX_UPGRADE_DETECTED" Secure="yes" />
+        <Upgrade Id="D47B2416-5D83-4EBD-9DCC-40F05E542516">
+            <UpgradeVersion Maximum="0.0.0.1" Property="WIX_UPGRADE_DETECTED" MigrateFeatures="yes" IncludeMaximum="yes" />
+            <UpgradeVersion Minimum="1.0.0.0" Property="WIX_DOWNGRADE_DETECTED" OnlyDetect="yes" />
+        </Upgrade>
+        <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallValidate" />
+        </InstallExecuteSequence>
     </Product>
 </Wix>
