@@ -16,7 +16,7 @@ const logger = require('./lib/simple-logger');
 const PROCESS_NAME = paths.basename(process.argv0);
 
 /* Setup constants */
-const WORK_DIR = paths.join(os.tmpdir(), PROCESS_NAME);
+const WORK_DIR = paths.join(os.tmpdir(), paths.basename(PROCESS_NAME, '.exe'));
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
 const COMMS_DIR = paths.join(WORK_DIR, 'comms');
 const USER = os.userInfo().username;
