@@ -3,6 +3,8 @@
     <Product Id="DEDC0CB2-77B3-4622-8829-68997F07D177" Name="Electron URL Launcher" Language="1033" Version="1.0.0.0" Manufacturer="CEPW" UpgradeCode="D47B2416-5D83-4EBD-9DCC-40F05E542516">
         <Package Description="Electron URL Launcher" Comments="This installer database contains the logic and data required to install Electron URL Launcher." InstallerVersion="200" Compressed="yes" Platform="x86" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <WixVariable Id="WixUIBannerBmp" Value="..\assets\wix\banner.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="..\assets\wix\dialog.bmp" />
         <Condition Message="This application is only supported on Windows 7, Windows Server 2008 R2, or higher.">Installed OR (VersionNT &gt;= 601)</Condition>
         <Condition Message="A later version of [ProductName] is already installed. Setup will now exit.">NOT WIX_DOWNGRADE_DETECTED</Condition>
         <Directory Id="TARGETDIR" Name="SourceDir">
