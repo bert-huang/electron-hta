@@ -8,7 +8,7 @@
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFiles64Folder">
                 <Directory Id="INSTALLDIR" Name="Electron URL Launcher">
-                    <Component Win64="yes" Id="EnvironmentPath" KeyPath="yes" Guid="CF7DEEFC-5A17-4E08-9BF7-7540859DD004">
+                    <Component Win64="yes" Id="EnvironmentPath" Guid="3181FF99-A19F-4BFE-8EF7-464D98052171" KeyPath="yes">
                         <Environment Id="EnvironmentPath" Name="PATH" Value="[INSTALLDIR]" Separator=";" Action="set" Part="last" System="yes" Permanent="no" />
                     </Component>
                     <Component Win64="yes" Id="API_MS_WIN_CORE_CONSOLE_L1_1_0.DLL" Guid="*">
