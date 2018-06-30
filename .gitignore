@@ -66,5 +66,11 @@ typings/
 # Serverless directories
 .serverless
 
+# Wix Toolset
+*.wixobj
+*.wixpdb
+*.msi
+
 # build
 release-builds/
+
