@@ -9,7 +9,7 @@ const findprocess = require('find-process');
 const yargs = require('yargs');
 const urlParse = require('url-parse');
 const fetch = require('node-fetch');
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const logger = require('./lib/simple-logger');
 
 /* Get the current process name */
@@ -174,6 +174,17 @@ logger.setLogFile(logFile);
   } = argv;
 
   logger.setLogLevel(logLevel);
+  logger.debug(`Running with args:`);
+  logger.debug(`  URL          : ${url}`);
+  logger.debug(`  Width        : ${width}`);
+  logger.debug(`  Height       : ${height}`);
+  logger.debug(`  Maximize     : ${maximize}`);
+  logger.debug(`  Minimize     : ${minimize}`);
+  logger.debug(`  Always Top   : ${alwaysOnTop}`);
+  logger.debug(`  Full Screen  : ${fullscreen}`);
+  logger.debug(`  Show Menu    : ${showMenu}`);
+  logger.debug(`  Singleton    : ${singleton}`);
+  logger.debug(``);
 
   const isUrlValid = await validateUrl(url);
   if (!isUrlValid) {
@@ -196,11 +207,88 @@ logger.setLogFile(logFile);
         devTools: developer,
       },
     });
+    if (showMenu) {
+      const template = [
+        { label: 'File',
+          submenu: [
+            {role: 'quit'},
+          ]},
+        { label: 'Edit',
+          submenu: [
+            {role: 'undo'},
+            {role: 'redo'},
+            {type: 'separator'},
+            {role: 'cut'},
+            {role: 'copy'},
+            {role: 'paste'},
+            {role: 'pasteandmatchstyle'},
+            {role: 'delete'},
+            {role: 'selectall'},
+          ]},
+        { label: 'View',
+          submenu: [
+            {role: 'reload'},
+            {role: 'forcereload'},
+            ... developer ? [{role: 'toggledevtools'}] : [],
+            {type: 'separator'},
+            {role: 'resetzoom'},
+            {role: 'zoomin'},
+            {role: 'zoomout'},
+            {type: 'separator'},
+            {role: 'togglefullscreen'},
+          ]},
+        { role: 'window',
+          submenu: [
+            {role: 'minimize'},
+            {role: 'close'},
+          ]},
+      ];
+      if (os.platform() === 'darwin') {
+        template.unshift({
+          label: app.getName(),
+          submenu: [
+            {role: 'about'},
+            {type: 'separator'},
+            {role: 'services', submenu: []},
+            {type: 'separator'},
+            {role: 'hide'},
+            {role: 'hideothers'},
+            {role: 'unhide'},
+            {type: 'separator'},
+            {role: 'quit'},
+          ],
+        });
+        // Edit menu
+        template[1].submenu.push(
+          {type: 'separator'},
+          {
+            label: 'Speech',
+            submenu: [
+              {role: 'startspeaking'},
+              {role: 'stopspeaking'},
+            ],
+          }
+        );
+        // Window menu
+        template[3].submenu = [
+          {role: 'close'},
+          {role: 'minimize'},
+          {role: 'zoom'},
+          {type: 'separator'},
+          {role: 'front'},
+        ];
+      };
+
+      const menu = Menu.buildFromTemplate(template);
+      Menu.setApplicationMenu(menu);
+    }
+    else {
+      Menu.setApplicationMenu(null);
+    }
     win.loadURL(url);
     win.once('closed', onClose);
     win.once('ready-to-show', () => {
       logger.debug(`Window ready to show.`);
-      if (!showMenu) { win.setMenu(null); }
       win.show();
       win.setFullScreen(fullscreen);
       
