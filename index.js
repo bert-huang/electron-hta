@@ -200,9 +200,10 @@ logger.setLogFile(logFile);
     win.once('closed', onClose);
     win.once('ready-to-show', () => {
       logger.debug(`Window ready to show.`);
+      if (!showMenu) { win.setMenu(null); }
       win.show();
       win.setFullScreen(fullscreen);
-      if (!showMenu) { win.setMenu(null); }
+      
       if (maximize) { win.maximize(); }
       if (minimize) { win.minimize(); }
     });
