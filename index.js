@@ -53,7 +53,7 @@ const /* object */ parseArguments = () => (yargs
     maximize: {
       alias: 'm',
       describe: 'Start the application maximized',
-      default: false,
+      default: true,
       type: 'boolean',
     },
     minimize: {
@@ -90,7 +90,7 @@ const /* object */ parseArguments = () => (yargs
       alias: 'l',
       describe: 'Enable/disable logging (+ setting log level)',
       choices: ['NONE', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'],
-      default: 'NONE',
+      default: 'ERROR',
       type: 'string',
     },
   })
