@@ -85,6 +85,13 @@ const /* object */ parseArguments = () => (yargs
       describe: 'Enable developer console',
       default: false,
       type: 'boolean',
+      hidden: true,
+    },
+    zoom: {
+      alias: 'z',
+      describe: 'Set zoom factor between 0.25 and 5',
+      default: 1,
+      type: 'number',
     },
     logLevel: {
       alias: 'l',
@@ -171,7 +178,11 @@ logger.setLogFile(logFile);
     singleton,
     developer,
     logLevel,
+    zoom,
   } = argv;
+
+  /* Restrict zoom between 5 and 0.25 */
+  const zoomFactor = (!zoom) ? 1 : (zoom > 5.00) ? 5.00 : (zoom < 0.25) ? 0.25 : zoom;
 
   logger.setLogLevel(logLevel);
   logger.debug(`Running with args:`);
@@ -184,6 +195,7 @@ logger.setLogFile(logFile);
   logger.debug(`  Full Screen  : ${fullscreen}`);
   logger.debug(`  Show Menu    : ${showMenu}`);
   logger.debug(`  Singleton    : ${singleton}`);
+  logger.debug(`  Zoom Factor  : ${zoomFactor}`)
   logger.debug(``);
 
   const isUrlValid = await validateUrl(url);
@@ -205,6 +217,7 @@ logger.setLogFile(logFile);
         nodeIntegration: false,
         sandbox: true,
         devTools: developer,
+        zoomFactor: zoomFactor,
       },
     });
     if (showMenu) {
