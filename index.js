@@ -10,16 +10,24 @@ const yargs = require('yargs');
 const urlParse = require('url-parse');
 const fetch = require('node-fetch');
 const { app, BrowserWindow, Menu } = require('electron');
+
 const logger = require('./lib/simple-logger');
+const { getDefaultMenuTemplate } = require('./misc/electron-menu-templates');
 
 /* Get the current process name */
 const PROCESS_NAME = paths.basename(process.argv0);
+const PROCESS_PATH = paths.dirname(process.execPath);
 
 /* Setup constants */
 const WORK_DIR = paths.join(os.tmpdir(), paths.basename(PROCESS_NAME, '.exe'));
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
 const COMMS_DIR = paths.join(WORK_DIR, 'comms');
 const USER = os.userInfo().username;
+const DEV_MODE = process.mainModule.filename.indexOf('app.asar') === -1;
+
+const /* string */ getAsset = (assetPath) => DEV_MODE ?
+    `file://${assetPath}` :
+    `file://${paths.join(PROCESS_PATH, "/resources/app.asar", assetPath)}`;
 
 /*
  * Parses the command line arguments
@@ -163,7 +171,6 @@ logger.setLogFile(logFile);
  * Main routine
  */
 (async () => {
-  let win = null;
   const argv = parseArguments();
   /* Extract CLI arguments */
   const {
@@ -181,7 +188,7 @@ logger.setLogFile(logFile);
     zoom,
   } = argv;
 
-  /* Restrict zoom between 5 and 0.25 */
+   /* Restrict zoom between 5 and 0.25 */
   const zoomFactor = (!zoom) ? 1 : (zoom > 5.00) ? 5.00 : (zoom < 0.25) ? 0.25 : zoom;
 
   logger.setLogLevel(logLevel);
@@ -198,14 +205,14 @@ logger.setLogFile(logFile);
   logger.debug(`  Zoom Factor  : ${zoomFactor}`)
   logger.debug(``);
 
-  const isUrlValid = await validateUrl(url);
-  if (!isUrlValid) {
-    logger.error(`Invalid or unreachable URL: ${url}`);
-    app.quit();
-    return;
+  let win = null;
+  const loadURL = url => {
+    if (win) {
+      win.loadURL(url);
+    }
   }
 
-  const createWindow = (onClose) => {
+  const createWindow = async () => {
     logger.debug(`Creating window.`);
     win = new BrowserWindow({
       width,
@@ -221,93 +228,36 @@ logger.setLogFile(logFile);
       },
     });
     if (showMenu) {
-      const template = [
-        { label: 'File',
-          submenu: [
-            {role: 'quit'},
-          ]},
-        { label: 'Edit',
-          submenu: [
-            {role: 'undo'},
-            {role: 'redo'},
-            {type: 'separator'},
-            {role: 'cut'},
-            {role: 'copy'},
-            {role: 'paste'},
-            {role: 'pasteandmatchstyle'},
-            {role: 'delete'},
-            {role: 'selectall'},
-          ]},
-        { label: 'View',
-          submenu: [
-            {role: 'reload'},
-            {role: 'forcereload'},
-            ... developer ? [{role: 'toggledevtools'}] : [],
-            {type: 'separator'},
-            {role: 'resetzoom'},
-            {role: 'zoomin'},
-            {role: 'zoomout'},
-            {type: 'separator'},
-            {role: 'togglefullscreen'},
-          ]},
-        { role: 'window',
-          submenu: [
-            {role: 'minimize'},
-            {role: 'close'},
-          ]},
-      ];
-      if (os.platform() === 'darwin') {
-        template.unshift({
-          label: app.getName(),
-          submenu: [
-            {role: 'about'},
-            {type: 'separator'},
-            {role: 'services', submenu: []},
-            {type: 'separator'},
-            {role: 'hide'},
-            {role: 'hideothers'},
-            {role: 'unhide'},
-            {type: 'separator'},
-            {role: 'quit'},
-          ],
-        });
-        // Edit menu
-        template[1].submenu.push(
-          {type: 'separator'},
-          {
-            label: 'Speech',
-            submenu: [
-              {role: 'startspeaking'},
-              {role: 'stopspeaking'},
-            ],
-          }
-        );
-        // Window menu
-        template[3].submenu = [
-          {role: 'close'},
-          {role: 'minimize'},
-          {role: 'zoom'},
-          {type: 'separator'},
-          {role: 'front'},
-        ];
-      };
-
+      const template = getDefaultMenuTemplate(app, developer);
       const menu = Menu.buildFromTemplate(template);
       Menu.setApplicationMenu(menu);
     }
     else {
       Menu.setApplicationMenu(null);
     }
-    win.loadURL(url);
-    win.once('closed', onClose);
+    win.setTitle(url);
+    win.loadURL(getAsset("/assets/pages/loading.html"));
+    win.once('close', () => {
+      win = null;
+      logger.debug('Close window.')
+    });
     win.once('ready-to-show', () => {
-      logger.debug(`Window ready to show.`);
+      logger.debug(`Show window.`);
       win.show();
       win.setFullScreen(fullscreen);
       
       if (maximize) { win.maximize(); }
       if (minimize) { win.minimize(); }
     });
+
+    const isUrlValid = await validateUrl(url);
+    if (isUrlValid) {
+      win.loadURL(url);
+    } else {
+      logger.error(`Invalid or unreachable URL: ${url}`);
+      win.loadURL(getAsset("/assets/pages/invalid_url.html"));
+      return;
+    }
   };
 
   const focusApp = () => {
@@ -323,11 +273,11 @@ logger.setLogFile(logFile);
     }
   };
 
+  app.once('ready', createWindow);
   app.on('window-all-closed', () => {
     app.quit();
     return;
   });
-
   app.on('quit', () => {
     logger.debug(`Closing down.`);
   });
@@ -425,36 +375,24 @@ logger.setLogFile(logFile);
       watcher.on('add', onCommFileChange);
       watcher.on('change', onCommFileChange);
 
-      const onClose = () => {
-        logger.debug(`Closing window.`);
-        win = null;
+      const onQuit = () => {
+        
         /* Clean up lock and comm file on exit. */
         logger.debug(`Cleaning up lock and comm file.`);
         rimraf.sync(lockFile);
         rimraf.sync(commFile);
+
+        logger.debug(`Quit.`);
       };
 
-      logger.debug(`Initialising windows...`);
-      if (app.isReady()) {
-        createWindow(onClose);
-      }
-      else {
-        app.once('ready', createWindow.bind(this, onClose));
-      }
+      app.once('quit', onQuit);
     }
   }
   /* No special logic for non-singleton launch. */
   else {
-    const onClose = () => {
-      logger.debug(`Closing window.`);
-      win = null;
+    const onQuit = () => {
+     logger.debug(`Quit.`)
     };
-    logger.debug(`Initialising windows...`);
-    if (app.isReady()) {
-      createWindow(onClose);
-    }
-    else {
-      app.once('ready', createWindow.bind(this, onClose));
-    }
+    app.once('quit', onQuit);
   }
 })();

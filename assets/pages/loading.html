@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+      .lds-dual-ring {
+        position: absolute;
+        top: calc(50% - 23px);
+        left: calc(50% - 23px);
+        display: block;
+      }
+      .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 46px;
+        height: 46px;
+        margin: 1px;
+        border-radius: 50%;
+        border: 5px solid #000;
+        border-color: #333 transparent #333 transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+      }
+      @keyframes lds-dual-ring {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .lds-ripple {
+        position: absolute;
+        top: calc(50% - 47px);
+        left: calc(50% - 47px);
+        display: block;
+      }
+      .lds-ripple div {
+        position: absolute;
+        border: 10px solid #444;
+        opacity: 1;
+        border-radius: 50%;
+        animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+      }
+      .lds-ripple div:nth-child(2) {
+        animation-delay: -0.5s;
+      }
+      @keyframes lds-ripple {
+        0% {
+          top: 40px;
+          left: 40px;
+          width: 0;
+          height: 0;
+          opacity: 1;
+        }
+        100% {
+          top: -1px;
+          left: -1px;
+          width: 80px;
+          height: 80px;
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <span class="lds-dual-ring" />
+      <!-- <div class="lds-ripple"><div></div><div></div></div> -->
+    </div>
+  </body>
+</html>
