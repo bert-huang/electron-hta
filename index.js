@@ -253,7 +253,8 @@ logger.setLogFile(logFile);
     const isUrlValid = await validateUrl(url);
     if (isUrlValid) {
       win.loadURL(url);
-    } else {
+    }
+    else {
       logger.error(`Invalid or unreachable URL: ${url}`);
       win.loadURL(getAsset("/assets/pages/invalid_url.html"));
       return;
@@ -318,7 +319,16 @@ logger.setLogFile(logFile);
       else {
         const pid = fs.readFileSync(lockFile, 'utf8');
         logger.debug(`Lock content: ${pid}`);
-        const proc = await findProcess(pid);
+        
+        let proc;
+        try {
+          proc = await findProcess(pid);
+        }
+        catch (err) {
+          logger.error(`Unable to determine if process exists.`);
+          app.quit();
+          return;
+        }
         logger.debug(`PID corresponds to: ${proc ? proc.name : null}`);
         if (proc && proc.name === PROCESS_NAME) {
           logger.error(`Instance '${singleton}' is already running.`);
@@ -327,6 +337,7 @@ logger.setLogFile(logFile);
           app.quit();
           return;
         }
+        
         /* In the scenario where the lock is not cleaned up correctly,
          * and we cannot find an electron process with the given PID,
          * remove the lock. */
