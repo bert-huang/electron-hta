@@ -118,21 +118,21 @@ const /* object */ parseArguments = () => (yargs
  * it is reachable.
  */
 const /* boolean */ validateUrl = async (url) => {
-  const parsed = urlParse(url);
-  if (parsed.protocol === 'http:') {
-    if (!parsed.port) parsed.set('port', '80');
+
+  if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+    logger.debug(`Validating URL: ${url}`);
+
+    try {
+      const response = await fetch(url, {
+        method: 'HEAD',
+        mode: 'no-cors',
+        redirect: 'follow',
+      });
+      return response.ok;
+    } catch (e) {
+      return false;
+    }
   }
-  if (parsed.protocol === 'https:') {
-    if (!parsed.port) parsed.set('port', '443');
-  }
-  logger.debug(`Validating URL: ${parsed.href}`);
-  return fetch(parsed.href, {
-    method: 'HEAD',
-    mode: 'no-cors',
-    redirect: 'follow',
-  })
-    .then(response => response.ok)
-    .catch(() => false);
 };
 
 /*
