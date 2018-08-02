@@ -7,12 +7,11 @@ const rimraf = require('rimraf');
 const chokidar = require('chokidar');
 const findprocess = require('find-process');
 const yargs = require('yargs');
-const urlParse = require('url-parse');
 const fetch = require('node-fetch');
 const { app, BrowserWindow, Menu } = require('electron');
 
 const logger = require('./lib/simple-logger');
-const { getDefaultMenuTemplate } = require('./misc/electron-menu-templates');
+const { defaultMenuTemplate, getRunMenuItem } = require('./misc/electron-menu');
 
 /* Get the current process name */
 const PROCESS_NAME = paths.basename(process.argv0);
@@ -22,12 +21,13 @@ const PROCESS_PATH = paths.dirname(process.execPath);
 const WORK_DIR = paths.join(os.tmpdir(), paths.basename(PROCESS_NAME, '.exe'));
 const LOCKS_DIR = paths.join(WORK_DIR, 'locks');
 const COMMS_DIR = paths.join(WORK_DIR, 'comms');
+const PREFS_DIR = paths.join(WORK_DIR, 'preferences');
 const USER = os.userInfo().username;
 const DEV_MODE = process.mainModule.filename.indexOf('app.asar') === -1;
 
-const /* string */ getAsset = (assetPath) => DEV_MODE ?
-    `file://${assetPath}` :
-    `file://${paths.join(PROCESS_PATH, "/resources/app.asar", assetPath)}`;
+const /* string */ getResource = (resourcePath) => DEV_MODE ?
+    `file://${resourcePath}` :
+    `file://${paths.join(PROCESS_PATH, "/resources/app.asar", resourcePath)}`;
 
 /*
  * Parses the command line arguments
@@ -88,13 +88,6 @@ const /* object */ parseArguments = () => (yargs
       default: false,
       type: 'boolean',
     },
-    developer: {
-      alias: 'd',
-      describe: 'Enable developer console',
-      default: false,
-      type: 'boolean',
-      hidden: true,
-    },
     zoom: {
       alias: 'z',
       describe: 'Set zoom factor between 0.25 and 5',
@@ -107,6 +100,13 @@ const /* object */ parseArguments = () => (yargs
       choices: ['NONE', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'],
       default: 'ERROR',
       type: 'string',
+    },
+    developer: {
+      alias: 'd',
+      describe: 'Enable developer console',
+      default: false,
+      type: 'boolean',
+      hidden: true,
     },
   })
   .alias('help', 'h')
@@ -190,21 +190,23 @@ logger.setLogFile(logFile);
 
    /* Restrict zoom between 5 and 0.25 */
   const zoomFactor = (!zoom) ? 1 : (zoom > 5.00) ? 5.00 : (zoom < 0.25) ? 0.25 : zoom;
-
   logger.setLogLevel(logLevel);
-  logger.debug(`Running with args:`);
-  logger.debug(`  URL          : ${url}`);
-  logger.debug(`  Width        : ${width}`);
-  logger.debug(`  Height       : ${height}`);
-  logger.debug(`  Maximize     : ${maximize}`);
-  logger.debug(`  Minimize     : ${minimize}`);
-  logger.debug(`  Always Top   : ${alwaysOnTop}`);
-  logger.debug(`  Full Screen  : ${fullscreen}`);
-  logger.debug(`  Show Menu    : ${showMenu}`);
-  logger.debug(`  Singleton    : ${singleton}`);
-  logger.debug(`  Zoom Factor  : ${zoomFactor}`)
-  logger.debug(``);
+  logger.info(`Running with user: ${USER}`);
+  logger.info(`Running with args:`);
+  logger.info(`  URL          : ${url}`);
+  logger.info(`  Width        : ${width}`);
+  logger.info(`  Height       : ${height}`);
+  logger.info(`  Maximize     : ${maximize}`);
+  logger.info(`  Minimize     : ${minimize}`);
+  logger.info(`  Always Top   : ${alwaysOnTop}`);
+  logger.info(`  Full Screen  : ${fullscreen}`);
+  logger.info(`  Show Menu    : ${showMenu}`);
+  logger.info(`  Singleton    : ${singleton}`);
+  logger.info(`  Zoom Factor  : ${zoomFactor}`)
+  logger.info(``);
 
+  forceCreateDirectory(PREFS_DIR);
+  
   let win = null;
   const loadURL = url => {
     if (win) {
@@ -228,7 +230,11 @@ logger.setLogFile(logFile);
       },
     });
     if (showMenu) {
-      const template = getDefaultMenuTemplate(app, developer);
+      const template = defaultMenuTemplate(app, developer);
+        const execPrefFile = paths.join(PREFS_DIR, `${USER}.execs`);
+        const runMenu = getRunMenuItem(execPrefFile);
+        template.push(runMenu);
+
       const menu = Menu.buildFromTemplate(template);
       Menu.setApplicationMenu(menu);
     }
@@ -236,7 +242,7 @@ logger.setLogFile(logFile);
       Menu.setApplicationMenu(null);
     }
     win.setTitle(url);
-    win.loadURL(getAsset("/assets/pages/loading.html"));
+    win.loadURL(getResource("/assets/pages/loading.html"));
     win.once('close', () => {
       win = null;
       logger.debug('Close window.')
@@ -256,7 +262,7 @@ logger.setLogFile(logFile);
     }
     else {
       logger.error(`Invalid or unreachable URL: ${url}`);
-      win.loadURL(getAsset("/assets/pages/invalid_url.html"));
+      win.loadURL(getResource("/assets/pages/invalid_url.html"));
       return;
     }
   };
